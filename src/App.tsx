@@ -20,9 +20,22 @@ import { RoleMatrixView } from './components/RoleMatrixView.tsx';
 import { BackendHubView } from './components/BackendHubView.tsx';
 import { SettingsView } from './components/SettingsView.tsx';
 import { StaffManagementView } from './components/StaffManagementView.tsx';
+import { LoginView, AuthenticatedUser } from './components/LoginView.tsx';
+import { ROLE_PERMISSIONS } from './domain/rules.ts';
 
 export default function App() {
-  const [currentRole, setCurrentRole] = useState<UserRole>('clinic_admin');
+  const [currentUser, setCurrentUser] = useState<AuthenticatedUser | null>({
+    id: 'usr-1',
+    name: 'دکتر محمدرضا صادقی',
+    nationalId: '0071234567',
+    role: 'doctor',
+    roleTitle: 'متخصص طب کار و بیماری‌های شغلی (مسئول فنی)',
+    department: 'معاینات بالینی و صدور نظریه نهایی',
+    medicalCouncilNumber: '۹۸۷۶۵',
+    token: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.active_session_token',
+  });
+  const [currentRole, setCurrentRole] = useState<UserRole>('doctor');
+  const [customMatrix, setCustomMatrix] = useState<Record<UserRole, string[]>>(ROLE_PERMISSIONS);
   const [currentTab, setCurrentTab] = useState<string>('dashboard');
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
   const [patients, setPatients] = useState<Patient[]>(INITIAL_PATIENTS);
@@ -47,6 +60,19 @@ export default function App() {
     setCurrentTab('official-form');
   };
 
+  // If user is logged out, render the Login Screen
+  if (!currentUser) {
+    return (
+      <LoginView
+        onLogin={(loggedInUser) => {
+          setCurrentUser(loggedInUser);
+          setCurrentRole(loggedInUser.role);
+          setCurrentTab('dashboard');
+        }}
+      />
+    );
+  }
+
   return (
     <div className="min-h-screen bg-slate-50 flex flex-col font-sans text-slate-900" dir="rtl">
       {/* Top Header */}
@@ -62,6 +88,8 @@ export default function App() {
         onSelectPatient={setSelectedPatient}
         onOpenOfficialForm={() => handleOpenOfficialForm(selectedPatient)}
         onToggleSidebar={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
+        currentUser={currentUser}
+        onLogout={() => setCurrentUser(null)}
       />
 
       {/* Main Body with Sidebar + View */}
@@ -73,6 +101,7 @@ export default function App() {
           currentRole={currentRole}
           isCollapsed={isSidebarCollapsed}
           onToggleCollapse={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
+          customMatrix={customMatrix}
         />
 
         {/* Content Area */}
@@ -156,7 +185,9 @@ export default function App() {
             />
           )}
 
-          {currentTab === 'role-matrix' && <RoleMatrixView />}
+          {currentTab === 'role-matrix' && (
+            <RoleMatrixView matrix={customMatrix} onUpdateMatrix={setCustomMatrix} />
+          )}
 
           {currentTab === 'backend-hub' && <BackendHubView />}
 

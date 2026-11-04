@@ -28,6 +28,7 @@ interface Props {
   currentRole: UserRole;
   isCollapsed: boolean;
   onToggleCollapse: () => void;
+  customMatrix?: Record<UserRole, string[]>;
 }
 
 interface MenuItem {
@@ -64,8 +65,9 @@ export const Sidebar: React.FC<Props> = ({
   currentRole,
   isCollapsed,
   onToggleCollapse,
+  customMatrix,
 }) => {
-  const allowedItems = MENU_ITEMS.filter((item) => hasPermission(currentRole, item.id));
+  const allowedItems = MENU_ITEMS.filter((item) => hasPermission(currentRole, item.id, customMatrix));
 
   return (
     <aside

@@ -23,6 +23,8 @@ interface Props {
   onSelectPatient: (patient: Patient) => void;
   onOpenOfficialForm: () => void;
   onToggleSidebar: () => void;
+  currentUser?: { name: string; roleTitle: string; medicalCouncilNumber?: string } | null;
+  onLogout?: () => void;
 }
 
 const ROLE_LABELS: Record<UserRole, { title: string; color: string; badge: string }> = {
@@ -44,6 +46,8 @@ export const Header: React.FC<Props> = ({
   onSelectPatient,
   onOpenOfficialForm,
   onToggleSidebar,
+  currentUser,
+  onLogout,
 }) => {
   const [showNotifications, setShowNotifications] = useState(false);
   const [notifications, setNotifications] = useState([
@@ -182,15 +186,30 @@ export const Header: React.FC<Props> = ({
             )}
           </div>
 
-          {/* User Badge */}
+          {/* User Badge & Logout */}
           <div className="flex items-center gap-2 border-r border-slate-200 pr-2">
-            <div className="w-7 h-7 rounded-full bg-gradient-to-tr from-blue-600 to-indigo-600 text-white flex items-center justify-center text-xs font-bold">
-              {currentRole[0].toUpperCase()}
+            <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-indigo-600 to-blue-600 text-white flex items-center justify-center text-xs font-black shadow-xs">
+              {(currentUser?.name || ROLE_LABELS[currentRole].badge)[0]}
             </div>
-            <div className="hidden xl:block text-right">
-              <div className="text-xs font-bold text-slate-800 leading-tight">دکتر محمدی</div>
-              <div className="text-[10px] text-slate-400">{ROLE_LABELS[currentRole].badge}</div>
+            <div className="hidden sm:block text-right">
+              <div className="text-xs font-bold text-slate-900 leading-tight">
+                {currentUser?.name || 'کاربر سیستم طب کار'}
+              </div>
+              <div className="text-[10px] text-slate-500 font-medium">
+                {currentUser?.roleTitle || ROLE_LABELS[currentRole].title}
+              </div>
             </div>
+            {onLogout && (
+              <button
+                type="button"
+                onClick={onLogout}
+                title="خروج از حساب کاربری (Sign Out)"
+                className="p-1.5 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition mr-1 flex items-center gap-1 text-xs font-bold"
+              >
+                <LogOut className="w-4 h-4 text-rose-500" />
+                <span className="hidden md:inline text-rose-600 text-[11px]">خروج</span>
+              </button>
+            )}
           </div>
         </div>
       </div>

@@ -156,7 +156,13 @@ export const ROLE_PERMISSIONS: Record<UserRole, string[]> = {
   ],
 };
 
-export function hasPermission(role: UserRole, tabId: string): boolean {
-  const allowed = ROLE_PERMISSIONS[role] || [];
+export function hasPermission(
+  role: UserRole,
+  tabId: string,
+  customMatrix?: Record<UserRole, string[]>
+): boolean {
+  const activeMatrix = customMatrix || ROLE_PERMISSIONS;
+  const allowed = activeMatrix[role] || [];
   return allowed.includes(tabId);
 }
+
