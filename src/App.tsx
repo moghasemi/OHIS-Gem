@@ -19,6 +19,7 @@ import { CalendarView } from './components/CalendarView.tsx';
 import { RoleMatrixView } from './components/RoleMatrixView.tsx';
 import { BackendHubView } from './components/BackendHubView.tsx';
 import { SettingsView } from './components/SettingsView.tsx';
+import { StaffManagementView } from './components/StaffManagementView.tsx';
 
 export default function App() {
   const [currentRole, setCurrentRole] = useState<UserRole>('clinic_admin');
@@ -133,6 +134,8 @@ export default function App() {
           )}
 
           {currentTab === 'org' && <OrgPortalView patients={patients} />}
+
+          {currentTab === 'staff' && <StaffManagementView />}
 
           {currentTab === 'self' && (
             <PatientPortalView

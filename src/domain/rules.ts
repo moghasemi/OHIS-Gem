@@ -136,23 +136,23 @@ export function calculatePTA(frequencies: Record<number, number>): number {
  * Check RBAC access for a given role against a system resource/tab
  */
 export const ROLE_PERMISSIONS: Record<UserRole, string[]> = {
-  reception: ['dashboard', 'reception', 'self', 'profile', 'change-password', 'tickets', 'official-form'],
+  reception: ['dashboard', 'reception', 'staff', 'self', 'profile', 'change-password', 'tickets', 'official-form'],
   lab: ['dashboard', 'lab', 'profile', 'change-password', 'tickets', 'official-form'],
   para: ['dashboard', 'para', 'profile', 'change-password', 'tickets', 'official-form'],
   hse: ['dashboard', 'hse', 'profile', 'change-password', 'tickets', 'official-form'],
-  doctor: ['dashboard', 'doctor', 'templates', 'profile', 'change-password', 'tickets', 'official-form'],
+  doctor: ['dashboard', 'doctor', 'staff', 'templates', 'profile', 'change-password', 'tickets', 'official-form'],
   org: ['dashboard', 'org', 'self', 'patients', 'finance', 'services', 'profile', 'calendar', 'change-password', 'tickets', 'official-form'],
   clinic_admin: [
     'dashboard', 'reception', 'lab', 'para', 'hse', 'doctor', 'org', 'self',
     'patients', 'finance', 'profile', 'calendar', 'services', 'settings',
     'inventory', 'timeline', 'templates', 'documents', 'feedback', 'change-password',
-    'tickets', 'role-matrix', 'official-form', 'backend-hub'
+    'tickets', 'role-matrix', 'staff', 'official-form', 'backend-hub'
   ],
   superadmin: [
     'dashboard', 'reception', 'lab', 'para', 'hse', 'doctor', 'org', 'self',
     'patients', 'finance', 'profile', 'calendar', 'services', 'settings',
     'inventory', 'timeline', 'templates', 'documents', 'feedback', 'change-password',
-    'superadmin', 'tickets', 'role-matrix', 'official-form', 'backend-hub'
+    'superadmin', 'tickets', 'role-matrix', 'staff', 'official-form', 'backend-hub'
   ],
 };
 

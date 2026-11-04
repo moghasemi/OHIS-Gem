@@ -198,3 +198,24 @@ export interface CompanyContract {
   packageType: string;
   totalAmount: number;
 }
+
+export interface ClinicStaff {
+  id: string;
+  personnelCode: string;
+  firstName: string;
+  lastName: string;
+  nationalId: string;
+  mobile: string;
+  role: UserRole;
+  roleTitle: string;
+  department: string;
+  medicalCouncilNumber?: string;
+  hseLicenseNumber?: string;
+  stampNumber?: string;
+  shift: 'صبح' | 'عصر' | 'تمام‌وقت';
+  status: 'ACTIVE' | 'LEAVE' | 'SUSPENDED';
+  hireDate: string;
+  email: string;
+  lastLogin?: string;
+}
+

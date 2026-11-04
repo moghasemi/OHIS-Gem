@@ -17,6 +17,7 @@ import {
   Grid3X3,
   FileCheck2,
   Terminal,
+  Users,
   ChevronRight,
   ChevronLeft,
 } from 'lucide-react';
@@ -46,6 +47,7 @@ const MENU_ITEMS: MenuItem[] = [
   { id: 'doctor', label: 'پزشک طب کار (جداول ۵، ۸، ۹)', icon: Stethoscope, badge: 'قفل پرونده' },
   { id: 'official-form', label: 'فرم ۵ صفحه‌ای وزارت بهداشت', icon: FileCheck2, color: 'text-emerald-500' },
   { id: 'org', label: 'پرتال کارفرما و قراردادها', icon: Building2 },
+  { id: 'staff', label: 'پرسنل و کادر درمان مرکز', icon: Users, badge: 'پزشکان', color: 'text-indigo-500' },
   { id: 'self', label: 'پرتال مراجعه‌کننده و نوبت‌دهی', icon: CalendarCheck },
   { id: 'finance', label: 'گزارشات مالی و پوز', icon: Receipt },
   { id: 'tickets', label: 'سیستم تیکتینگ', icon: Ticket },
