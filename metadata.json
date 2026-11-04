@@ -1,0 +1,6 @@
+{
+  "name": "OHIS - سامانه جامع اطلاعات سلامت شغلی و طب کار",
+  "description": "سامانه یکپارچه مدیریت مراکز طب کار، پرونده الکترونیک سلامت شاغلین، گردش کار بالینی، نوبت‌دهی، امور مالی و فرم رسمی ۵ صفحه‌ای وزارت بهداشت",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

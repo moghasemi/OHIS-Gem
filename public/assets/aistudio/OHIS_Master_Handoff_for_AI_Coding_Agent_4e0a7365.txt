@@ -1,0 +1,2050 @@
+
+OHIS — MASTER HANDOFF / IMPLEMENTATION SPECIFICATION
+نسخه: Master Handoff v1.0
+هدف: تحویل کامل دانش، تصمیمات، معماری، الزامات و روش اجرای پروژه OHIS به یک AI Coding Agent
+
+====================================================================
+0) دستورالعمل اصلی برای AI CODING AGENT
+====================================================================
+
+تو به عنوان AI Coding Agent مسئول اجرای فنی پروژه OHIS هستی.
+
+این سند «خلاصه ساده» نیست؛ یک سند تحویل پروژه است. باید آن را مرجع اصلی اجرای فنی قرار دهی و قبل از هر تغییر معماری، ساختاری یا فازبندی، ابتدا این سند را مبنا قرار دهی.
+
+قوانین قطعی:
+
+1. معماری، ساختار، روش توسعه و فازبندی مصوب را خودسرانه تغییر نده.
+2. اگر یک تصمیم در این سند صریحاً نهایی شده، آن را دوباره پیشنهاد نکن.
+3. فقط در سه حالت مجاز به تغییر مسیر هستی:
+   - الزام قانونی/رگولاتوری جدید
+   - کشف نقص معماری بحرانی
+   - نیاز قطعی کسب‌وکار که در تحلیل قبلی وجود نداشته است
+   در هر سه حالت باید دلیل، اثر، گزینه‌ها و Migration Plan را مستند کنی و قبل از اعمال تغییر، تأیید انسانی بگیری.
+4. کیفیت بر سرعت مقدم است: «اول درست، بعد سریع».
+5. Security, Privacy, Data Integrity و Audit از ابتدا جزو طراحی هستند، نه کارهای انتهای پروژه.
+6. هیچ Secret، Password، Token، OTP یا داده حساس پزشکی در Git، Log یا Source Code قرار نگیرد.
+7. هیچ Feature بدون تحلیل، تست، مستندات، Review و بررسی امنیتی Done نیست.
+8. Business Logic نباید در Controller/View/Serializer/React UI پخش شود؛ باید در لایه‌های Domain/Application قرار گیرد.
+9. هر چیزی که ساخته می‌شود باید بخشی از محصول واقعی باشد؛ پروژه تمرینی بی‌ربط نساز.
+10. قبل از پیاده‌سازی هر بخش، Requirement و Acceptance Criteria آن را از این سند استخراج کن.
+11. تغییرات را کوچک، قابل Review و قابل Rollback نگه دار.
+12. هر تصمیم معماری مهم را در ADR ثبت کن.
+13. اگر ابهام واقعاً مانع اجرای صحیح است، توقف کن و سؤال دقیق بپرس؛ حدس خطرناک نزن.
+14. اگر ابهام صرفاً جزئی است و تصمیم امن و سازگار با معماری وجود دارد، آن را با ADR ثبت کن و ادامه بده.
+15. تمام APIها، مدل‌ها، Permissionها، Workflowها و رویدادهای حساس باید Auditability داشته باشند.
+16. برای داده‌های پزشکی، اصل Least Privilege و Data Minimization اجباری است.
+17. Tenant/Center/Organization isolation باید در Backend enforce شود؛ صرفاً مخفی کردن داده در Frontend قابل قبول نیست.
+18. هیچ تصمیمی صرفاً به دلیل «ساده‌تر بودن» نباید باعث بدهی فنی یا امنیتی جدی شود.
+
+====================================================================
+1) معرفی پروژه
+====================================================================
+
+نام محصول:
+OHIS
+
+مخفف:
+Occupational Health Information System
+
+نوع:
+سامانه Enterprise/SaaS مدیریت سلامت شغلی و مراکز طب کار.
+
+هدف:
+ایجاد یک پلتفرم امن، مقیاس‌پذیر، چندمرکزی/چندمستاجری و قابل توسعه برای مدیریت کامل فرآیندهای طب کار، از ثبت شرکت و قرارداد تا نوبت‌دهی، پذیرش، پرونده پزشکی، آزمایشگاه، پاراکلینیک، معاینات، ارجاع، نظر نهایی پزشک، امور مالی، گزارش، ارتباط با مراجعه‌کننده و کارفرما.
+
+اصل راهبردی:
+OHIS نباید فقط یک CRUD application باشد؛ باید یک پلتفرم عملیاتی و قابل توسعه با موتورهای مشترک باشد.
+
+====================================================================
+2) چشم‌انداز محصول
+====================================================================
+
+OHIS باید بتواند:
+
+- چند مرکز طب کار را مدیریت کند.
+- برای هر مرکز Website/صفحه اختصاصی داشته باشد.
+- نوبت‌دهی اینترنتی ارائه دهد.
+- پرتال مراجعه‌کننده ارائه دهد.
+- پرتال کارفرما/نماینده کارفرما ارائه دهد.
+- شرکت‌ها و قراردادهای آن‌ها را مدیریت کند.
+- کارکنان/مراجعه‌کنندگان را وارد سیستم کند.
+- ورود اطلاعات از طریق UI، Excel و در آینده API/Integration را پشتیبانی کند.
+- فرآیند پذیرش تا تکمیل پرونده را Workflow-driven کند.
+- صف‌های آزمایشگاه، بهداشت حرفه‌ای و پاراکلینیک را مدیریت کند.
+- پرونده را پس از تأیید پزشک Lock کند.
+- ارجاع به متخصص را مدیریت کند و در صورت نیاز فرآیند را تا دریافت نتیجه متوقف کند.
+- پرداخت و بدهی/اعتبار کارفرما را مدیریت کند.
+- گزارش‌های عملیاتی، مدیریتی و قانونی تولید کند.
+- فرم رسمی پرونده پزشکی شاغل را با ساختار و اطلاعات کامل بازتولید کند.
+- خروجی چاپی بسیار نزدیک به فرم رسمی منبع ارائه دهد.
+- سیستم Ticketing داخلی داشته باشد.
+- Knowledge Base داشته باشد.
+- Notification و SMS داشته باشد.
+- Document Management داشته باشد.
+- Audit کامل داشته باشد.
+- در آینده Payroll/Tax/Insurance/BI/AI/Mobile و Integrationهای گسترده را بدون بازطراحی بنیادی پشتیبانی کند.
+
+====================================================================
+3) مخاطبان و نقش‌های کلیدی
+====================================================================
+
+گروه‌های اصلی:
+
+- Super Admin / Platform Admin
+- Tenant/Organization Admin
+- Center Manager
+- Receptionist
+- Occupational Health Expert
+- Physician
+- Specialist / Referral Provider
+- Laboratory Staff
+- Paraclinic Staff
+- Finance Staff
+- Employer / Company Representative
+- Employee / Examinee / مراجعه‌کننده
+- Support / Ticket Agent
+- Auditor
+- System/Integration Service Account
+
+RBAC باید granular باشد و در صورت نیاز با ABAC/Policy Rules ترکیب شود.
+
+Permission نباید صرفاً بر اساس URL یا Frontend Button باشد.
+
+====================================================================
+4) معماری نهایی
+====================================================================
+
+معماری اصلی:
+
+- Modular Monolith
+- DDD-ready
+- Clean Architecture
+- Internal Event-Driven Architecture
+- SaaS / Multi-Tenant
+- Security & Privacy by Design
+
+در نسخه اولیه Microservice ایجاد نمی‌کنیم.
+
+دلیل:
+- کاهش پیچیدگی عملیاتی
+- سرعت توسعه
+- Transactionهای یکپارچه
+- مناسب برای تیم کوچک
+- امکان استخراج سرویس‌ها در آینده
+
+اما مرزهای Domain باید از ابتدا واضح باشند تا Extraction آینده ممکن باشد.
+
+الگوی منطقی:
+
+Presentation/UI
+        ↓
+Application
+        ↓
+Domain
+        ↓
+Infrastructure
+
+Business Logic در Domain/Application است.
+
+Infrastructure مسئول:
+- DB
+- External APIs
+- SMS
+- Email
+- Payment
+- File Storage
+- Queue
+- Cache
+- سایر Adapterها
+
+====================================================================
+5) Monorepo
+====================================================================
+
+یک Monorepo داریم.
+
+ساختار ریشه canonical:
+
+OHIS/
+├── backend/
+├── frontend/
+├── infrastructure/
+├── deployment/
+├── docs/
+├── scripts/
+├── tools/
+├── tests/
+├── .github/
+├── .gitignore
+├── README.md
+├── LICENSE
+└── docker-compose.yml
+
+اصل Everything as Code:
+- Code
+- Documentation
+- Docker
+- Migrations
+- CI/CD
+- Scripts
+- نمونه Configuration غیرحساس
+باید در Repository قابل بازسازی باشند.
+
+====================================================================
+6) Backend Structure
+====================================================================
+
+backend/
+├── apps/
+├── core/
+├── config/
+├── common/
+├── media/
+├── static/
+├── templates/
+├── locale/
+├── requirements/
+└── manage.py
+
+نکته:
+در نسخه نهایی این ساختار، `common` مرجع canonical برای کدهای عمومی است.
+اگر سند قدیمی‌تر `shared` گفته بود، آن را به‌عنوان draft تاریخی تلقی کن و برای implementation از `common` استفاده کن.
+
+apps:
+تمام Business Domainها.
+
+core:
+هسته مشترک:
+- Authentication
+- Authorization
+- Permission
+- Audit
+- Logging
+- Base Models
+- Exceptions
+- Common security primitives
+
+config:
+settings:
+- base.py
+- development.py
+- testing.py
+- staging.py
+- production.py
+
+common:
+- shared utilities
+- validators
+- constants
+- عمومی‌ترین helperها
+ولی Business Logic نباید بی‌دلیل در common ریخته شود.
+
+requirements:
+- base.txt
+- development.txt
+- testing.txt
+- production.txt
+
+====================================================================
+7) Frontend Structure
+====================================================================
+
+frontend/
+└── src/
+    ├── app/
+    ├── modules/
+    ├── components/
+    ├── pages/
+    ├── layouts/
+    ├── services/
+    ├── hooks/
+    ├── stores/
+    ├── assets/
+    ├── styles/
+    ├── routes/
+    └── types/
+
+Frontend:
+- React
+- RTL
+- Persian UI
+- Persian calendar support
+- Accessibility
+- Responsive
+- Component-based
+- Domain-oriented modules
+
+Frontend محل enforce کردن Security نیست؛ فقط UI enforcement است.
+Backend مرجع نهایی Permission و Data Access است.
+
+====================================================================
+8) Infrastructure
+====================================================================
+
+infrastructure/
+├── docker/
+├── postgres/
+├── redis/
+├── nginx/
+└── monitoring/
+
+زیرساخت‌های اصلی:
+- PostgreSQL
+- Redis
+- Celery/Task Queue
+- File Storage
+- Nginx/Reverse Proxy
+- Monitoring
+- Logging
+
+Docker از مرحله مناسب Phase 6 وارد implementation می‌شود و برای reproducibility استفاده می‌شود.
+
+====================================================================
+9) Git Strategy
+====================================================================
+
+Branchها:
+
+main
+develop
+feature/*
+
+main:
+Stable/Release-ready.
+
+develop:
+Integration branch توسعه.
+
+feature/*:
+هر Feature مستقل.
+
+نمونه:
+feature/authentication
+feature/contracts
+feature/reception
+feature/workflow
+
+روی main Push مستقیم نباید انجام شود.
+Merge از طریق Pull Request.
+
+Commit convention:
+- feat:
+- fix:
+- docs:
+- test:
+- refactor:
+- security:
+- style:
+- chore:
+
+مثال:
+feat(auth): add login endpoint
+
+Commit باید:
+- کوچک
+- معنی‌دار
+- قابل rollback
+- مرتبط با Issue/Task
+باشد.
+
+Semantic Versioning:
+0.1.0
+0.2.0
+...
+1.0.0
+
+====================================================================
+10) Coding Standards
+====================================================================
+
+Backend:
+- PEP8
+- Formatter
+- Linter
+- Type checking در نقاط لازم
+- Tests
+
+Frontend:
+- ESLint
+- Prettier
+- TypeScript
+- Component conventions
+
+Naming:
+Database: snake_case
+Python variables/functions: snake_case
+Python classes: PascalCase
+React Components: PascalCase
+Frontend variables: camelCase
+
+Code formatted نشده نباید Commit شود.
+
+====================================================================
+11) Definition of Done
+====================================================================
+
+Feature فقط وقتی Done است که:
+
+- Analysis complete
+- Acceptance Criteria complete
+- Code complete
+- Tests pass
+- Code Review complete
+- Documentation updated
+- Security check complete
+- Development environment verified
+- No unresolved critical warning
+- Migration/rollback strategy مشخص
+- Audit/permission impact بررسی شده
+
+اصل:
+«اول درست، بعد سریع.»
+
+====================================================================
+12) Privacy & Security
+====================================================================
+
+امنیت برای OHIS یک Feature جانبی نیست.
+
+Threat Modeling قبلاً انجام شده و Security باید در implementation باقی بماند.
+
+رویکرد:
+- STRIDE
+- Zero Trust principles
+- Least Privilege
+- Defense in Depth
+- Secure by Default
+- Privacy by Design
+- Data Minimization
+- Integrity by Design
+- Auditability
+
+موارد حساس:
+- Medical Records
+- Lab Results
+- Imaging/Paraclinic
+- Referrals
+- Physician Conclusions
+- National ID
+- Contact Information
+- Contracts
+- Financial Records
+- Authentication Data
+- Documents
+
+هیچ Secret در Git.
+
+.env در Gitignore.
+
+Log نباید شامل:
+- Password
+- Access Token
+- Refresh Token
+- OTP
+- Secret
+- Full sensitive medical payload
+باشد.
+
+در صورت نیاز برای Audit از:
+- Actor
+- Timestamp
+- Action
+- Target
+- Result
+- Request/Correlation ID
+- Reason/Context
+استفاده شود؛ اما بدون افشای داده حساس غیرضروری.
+
+====================================================================
+13) Data Integrity
+====================================================================
+
+صحت داده یکی از مهم‌ترین اهداف OHIS است.
+
+اصول:
+- Database constraints
+- Unique constraints
+- Foreign keys
+- Check constraints
+- Validation
+- Domain rules
+- Optimistic concurrency در نقاط لازم
+- Transaction boundaries
+- Audit trail
+- Immutable records در نقاط حساس
+- Versioning برای فرم‌ها/اسناد/نتایج مهم
+
+پرونده پزشکی پس از Final Approval پزشک باید Lock شود.
+اصلاح بعدی باید از فرآیند کنترل‌شده:
+- amendment
+- version
+- audit
+عبور کند؛ نه overwrite بی‌ردپا.
+
+====================================================================
+14) Multi-Tenancy
+====================================================================
+
+OHIS SaaS است.
+
+مرزهای Tenant/Organization/Center باید از ابتدا مشخص باشند.
+
+هیچ Query حساس نباید بدون tenant/organization scope اجرا شود.
+
+Data isolation باید:
+- Application
+- Database
+- Permission
+در حد مناسب enforce شود.
+
+Super Admin تنها نقش مجاز به cross-tenant access در شرایط تعریف‌شده است.
+
+هر دسترسی cross-scope باید Audit شود.
+
+====================================================================
+15) موتورهای سیستم
+====================================================================
+
+هسته OHIS شامل موتورهای زیر است:
+
+1. Workflow Engine
+2. Rule Engine
+3. Permission Engine
+4. Form Engine
+5. Report Engine
+6. Notification Engine
+7. Financial Engine
+8. Ticket Engine
+9. CMS Engine
+10. Scheduler Engine
+11. Integration Engine
+12. Audit Engine
+13. Document Management Engine (DMS)
+
+این‌ها قابلیت‌های shared platform هستند و نباید برای هر Domain جداگانه دوباره ساخته شوند.
+
+====================================================================
+16) Workflow Engine
+====================================================================
+
+Workflow برای فرآیندهایی مثل:
+
+- پذیرش
+- معاینه
+- آزمایش
+- پاراکلینیک
+- ارجاع
+- تأیید پزشک
+- صدور نتیجه
+- پرداخت
+
+State/Transition/Guard/Action/Actor/Audit را پشتیبانی کند.
+
+نمونه:
+Receptioned
+→ WaitingForLab
+→ LabCompleted
+→ WaitingForParaclinic
+→ WaitingForPhysician
+→ ReferralRequired
+→ AwaitingReferral
+→ FinalReview
+→ Locked/Completed
+
+این صرفاً نمونه است؛ Workflow واقعی باید بر اساس Domain Rules پیاده شود.
+
+====================================================================
+17) Permission Engine
+====================================================================
+
+RBAC پایه است.
+
+اما برای OHIS:
+- Role
+- Permission
+- Scope
+- Tenant
+- Center
+- Department
+- Resource
+- Action
+ممکن است لازم باشد.
+
+Frontend نباید Permission را مرجع نهایی قرار دهد.
+
+هر API باید Authorization مستقل داشته باشد.
+
+Permissionهای حساس Audit شوند.
+
+====================================================================
+18) Form Engine
+====================================================================
+
+برای فرم‌های پویا و فرم‌های پزشکی.
+
+قابلیت‌ها:
+- Field
+- Section
+- Required
+- Validation
+- Conditional field
+- Version
+- Form template
+- Workflow relation
+- Print mapping
+- Audit
+
+فرم رسمی وزارت بهداشت باید به صورت نسخه‌پذیر مدیریت شود.
+
+====================================================================
+19) Report Engine
+====================================================================
+
+گزارش:
+- Operational
+- Management
+- Financial
+- Clinical/Occupational
+- Regulatory
+- Export
+- Print
+
+خروجی‌های PDF/Excel در صورت نیاز.
+
+گزارش‌های حساس باید Permission و Audit داشته باشند.
+
+====================================================================
+20) Notification Engine
+====================================================================
+
+کانال‌ها:
+- SMS
+- Email
+- In-App
+- آینده: Push/WhatsApp/سایر در صورت نیاز قانونی/فنی
+
+Template
+→ Event
+→ Recipient
+→ Channel
+→ Delivery
+→ Retry
+→ Audit
+
+OTPها باید:
+- Expiry
+- Rate limit
+- Attempt limit
+- One-time use
+داشته باشند.
+
+====================================================================
+21) Financial Engine
+====================================================================
+
+پشتیبانی از:
+- Package
+- Pricing
+- Invoice/Charge
+- Employer Deposit/Credit
+- Payment
+- Cash
+- Bank Transfer
+- Receipt
+- Refund در صورت نیاز
+- Outstanding Balance
+- Financial Audit
+
+Payment و Financial status نباید صرفاً با یک boolean مدیریت شود.
+
+State Machine لازم است.
+
+====================================================================
+22) Ticket Engine
+====================================================================
+
+OHIS سیستم Ticketing داخلی دارد.
+
+Ticket شامل:
+- Ticket number
+- Requester
+- Organization/Tenant
+- Center
+- Category
+- Priority
+- Status
+- Assignment
+- SLA
+- Comments
+- Attachments
+- Internal notes
+- Audit
+- History
+
+قابلیت:
+- ایجاد
+- Assign
+- Escalate
+- SLA
+- Resolve
+- Reopen
+- Close
+
+Knowledge Base باید با Ticket Engine قابل اتصال باشد.
+
+====================================================================
+23) CMS Engine و Website
+====================================================================
+
+هر مرکز باید صفحه/Website خود را داشته باشد.
+
+قابلیت‌های مرکز:
+- معرفی مرکز
+- خدمات
+- پزشکان
+- ساعات
+- آدرس
+- تماس
+- اخبار/محتوا در صورت نیاز
+- SEO پایه
+- لینک نوبت‌دهی
+
+همچنین یک Website مستقل برای معرفی خود محصول OHIS وجود دارد.
+
+این Website محصول برای:
+- معرفی محصول
+- معرفی قابلیت‌ها
+- معرفی ارزش پیشنهادی
+- مشتریان بالقوه
+- درخواست Demo
+- تماس
+- مستندات عمومی
+است.
+
+Website بازاریابی محصول از سامانه عملیاتی جدا از نظر Deployment/Boundary نگه داشته شود، اما می‌تواند از API/CMS مشترک یا یک CMS هماهنگ استفاده کند؛ تصمیم نهایی باید با ADR ثبت شود.
+
+====================================================================
+24) Appointment / Online Booking
+====================================================================
+
+نوبت‌دهی اینترنتی الزامی است.
+
+کاربر:
+Website مرکز
+→ انتخاب خدمت
+→ زمان
+→ اطلاعات لازم
+→ احراز/تأیید
+→ رزرو
+→ Notification
+→ ورود به Portal در صورت نیاز
+
+باید:
+- جلوگیری از Double Booking
+- ظرفیت
+- تعطیلات
+- Schedule
+- Cancellation
+- Reschedule
+- No-show
+- Audit
+را مدیریت کند.
+
+====================================================================
+25) Patient/Examinee Portal
+====================================================================
+
+پرتال مراجعه‌کننده:
+- ورود امن
+- مشاهده نوبت
+- وضعیت فرآیند
+- فرم‌های لازم
+- Notification
+- اسناد مجاز
+- نتایج مجاز
+- پرداخت‌های مجاز
+- درخواست/پیگیری در صورت تعریف
+
+دسترسی فقط به داده متعلق به همان شخص.
+
+====================================================================
+26) Employer Portal
+====================================================================
+
+کارفرما/نماینده:
+- Company profile
+- Contracts
+- Employees
+- Bulk import
+- Excel
+- Appointment management
+- Package
+- Financial balance
+- Reports مجاز
+- وضعیت معاینات
+- Documents
+- Notifications
+
+اطلاعات پزشکی فردی فقط در حدود قانونی/Permission و Privacy قابل نمایش است.
+
+اصل:
+کارفرما مالک پرونده پزشکی فرد نیست.
+
+====================================================================
+27) Company & Contract
+====================================================================
+
+Company:
+- Legal identity
+- Contact
+- Representatives
+- Address
+- Status
+
+Contract:
+- Company
+- Center
+- Start/End
+- Services
+- Pricing
+- Package
+- Capacity/Terms
+- Financial terms
+- Documents
+- Status
+- Version/History
+
+Contract change نباید تاریخچه را از بین ببرد.
+
+====================================================================
+28) Person / Employee / Examinee
+====================================================================
+
+Person باید Entity پایه قابل استفاده مجدد باشد.
+
+ممکن است شخص:
+- Employee
+- Examinee
+- Employer Representative
+- Doctor
+- Staff
+باشد.
+
+از Duplicate Person جلوگیری شود.
+
+National ID باید:
+- Validation
+- Uniqueness در Scope مناسب
+- Protection
+- Audit
+داشته باشد.
+
+====================================================================
+29) Reception
+====================================================================
+
+پذیرش نقطه ورود فرآیند عملیاتی است.
+
+قابلیت:
+- Appointment
+- Walk-in در صورت مجاز
+- Identity verification
+- Contract/package verification
+- Queue
+- Payment status
+- Required forms
+- Initial data
+- Consent/confirmation
+- Fingerprint/signature در آینده/در صورت فعال بودن
+
+قبل از نهایی شدن فرآیند:
+- SMS confirmation برای چاپ/امضای نهایی طبق تحلیل قبلی
+- biometric در آینده، نه الزام نسخه اول
+
+====================================================================
+30) Clinical / Occupational Health
+====================================================================
+
+پرونده پزشکی شاغل باید ساختاریافته، نسخه‌پذیر، Audit-able و قابل چاپ باشد.
+
+اطلاعات باید بر اساس Domain مدل شوند، نه صرفاً یک JSON بزرگ بدون ساختار.
+
+با این حال Form Engine می‌تواند presentation و برخی فرم‌های پویا را مدیریت کند.
+
+====================================================================
+31) فرم رسمی «پرونده پزشکی شاغل» — الزام قطعی
+====================================================================
+
+فایل مرجع پروژه:
+«فرم پرونده پزشکی شاغل.pdf»
+
+این فایل 5 صفحه دارد و باید چندین بار با دقت مطالعه شده و به عنوان Reference رسمی فرم/چاپ در نظر گرفته شود.
+
+هدف:
+سامانه باید در نهایت نسخه چاپی نزدیک به فرم مرجع تولید کند و تمام اطلاعات/ساختار آن را پوشش دهد.
+
+بخش‌های اصلی فرم:
+
+صفحه 1:
+- عنوان وزارت بهداشت، درمان و آموزش پزشکی
+- معاونت بهداشت / مرکز سلامت محیط و کار
+- پرونده پزشکی شاغل
+- نوع معاینات:
+  - بدواستخدام
+  - دوره‌ای
+  - موردی
+- محل عکس
+- تاریخ
+- شماره پرونده
+- شماره استخدامی شاغل
+- مشخصات فردی:
+  - نام و نام خانوادگی
+  - نام پدر
+  - جنس
+  - وضعیت تأهل
+  - تعداد فرزند
+  - سال تولد
+  - کد ملی
+  - وضعیت نظام وظیفه
+  - رسته خدمت
+  - علت معافیت پزشکی
+  - آدرس و تلفن محل کار
+- سوابق شغلی:
+  - مشاغل فعلی
+  - سمت/عنوان
+  - وظیفه محوله
+  - تاریخ اشتغال
+  - علت تغییر شغل
+  - از/تا
+  - مشاغل قبلی
+- ارزیابی عوامل زیان‌آور شغلی:
+  - فیزیکی
+  - شیمیایی
+  - بیولوژیک
+  - ارگونومی
+  - روانی
+- عوامل فیزیکی:
+  - سر و صدا
+  - ارتعاش
+  - اشعه غیر یونیزان
+  - اشعه یونیزان
+  - استرس حرارتی
+  - سایر
+- عوامل شیمیایی:
+  - گردوغبار
+  - دمه فلزات
+  - حلال
+  - آفت‌کش‌ها
+  - اسید و بازها
+  - گازها
+- عوامل بیولوژیک:
+  - گزش
+  - باکتری
+  - ویروس
+  - انگل
+  - سایر
+- عوامل ارگونومیک:
+  - ایستادن/نشستن طولانی
+  - کار تکراری
+  - حمل بار سنگین
+  - وضعیت نامناسب بدن
+  - سایر
+- عوامل روانی:
+  - نوبت‌کاری
+  - استرس‌های شغلی
+  - سایر
+- مشاغل قبلی نیز باید عوامل زیان‌آور مشابه را داشته باشند.
+- ثبت نتایج اندازه‌گیری‌ها و توضیحات
+- نظریه کارشناس بهداشت حرفه‌ای در خصوص شرایط محیط کار
+- نام و نام خانوادگی کارشناس
+- تاریخ
+- مهر و امضاء
+
+صفحه 2:
+- سابقه شخصی و خانوادگی پزشکی، بر اساس پاسخ شاغل
+- امضا و اثر انگشت شاغل برای تأیید اظهارات
+- معاینات
+- تاریخ
+- قد
+- وزن
+- فشار خون
+- نبض
+- معاینه ارگان‌ها
+- عمومی:
+  Symptoms:
+  کاهش وزن، کاهش اشتها، خستگی مزمن، اختلال خواب، تعریق، عدم تحمل گرما/سرما، تب، سایر، بدون علامت
+  Signs:
+  وضعیت ظاهری ill/toxic، رنگ‌پریدگی مخاطات، سایر، بدون نشانه
+- چشم:
+  Symptoms:
+  کاهش حدت بینایی، تاری دید، خستگی چشم، دوبینی، سوزش، خارش، ترس از نور، اشک‌ریزش، سایر، بدون علامت
+  Signs:
+  رفلکس غیرطبیعی مردمک، قرمزی، اسکلرای ایکتریک، نیستاگموس، سایر، بدون نشانه
+- پوست/مو/ناخن:
+  خارش، ریزش مو، قرمزی، تغییر رنگ، زخم مزمن، پوسته‌ریزی، تغییر رنگ ناخن، سایر، بدون علامت
+  Sign:
+  ماکول، پاپول، ندول، وزیکول، زخم، کهیر، کلابینگ، ریزش منطقه‌ای مو، ریزش مو، تغییرات پیگمانی، سایر، بدون نشانه
+- گوش/بینی/دهان/حلق:
+  Symptoms:
+  کاهش شنوایی، وزوز، سرگیجه، درد گوش، ترشح گوش، گرفتگی صدا، درد گلو، آبریزش بینی، اختلال بویایی، خارش/سوزش بینی، خونریزی بینی، خشکی دهان، احساس مزه فلزی، سایر، بدون علامت
+  Signs:
+  التهاب پرده تمپان، پارگی پرده، سرومن غیرطبیعی، ترشح پشت حلق، اگزودای حلق، قرمزی حلق، پولیپ بینی، تندرنس سینوس، Lead Line، بوی بد دهان، التهاب لثه، زخم سپتوم/پرفوراسیون، سایر، بدون نشانه
+- سر و گردن:
+  درد گردن، توده گردنی، سایر، بدون علامت
+  بزرگی تیروئید، لنفادنوپاتی گردنی، سایر، بدون نشانه
+- پرسش‌های سابقه پزشکی/شغلی:
+  1. سابقه بیماری
+  2. تغییر علائم در محیط کار
+  3. علائم مشابه همکاران
+  4. تغییر علائم در تعطیلات/مرخصی
+  5. حساسیت به غذا/دارو/ماده
+  6. بستری بیمارستان و علت
+  7. سابقه عمل جراحی
+  8. سابقه سرطان/بیماری مزمن خانوادگی
+  9. مصرف دارو
+  10. سیگار فعلی، تعداد نخ و مدت
+  11. سابقه قبلی سیگار
+  12. ورزش/سرگرمی
+  13. حادثه شغلی، نوع و علت آسیب
+  14. غیبت بیش از 3 روز به علت بیماری
+  15. مجاورت منزل با مرکز صنعتی
+  16. سابقه معرفی به کمیسیون پزشکی
+
+صفحه 3:
+- ریه:
+  سرفه، خلط، تنگی نفس کوششی، خس‌خس، سایر، بدون علامت
+  وضعیت ظاهری غیرطبیعی قفسه سینه، خشونت صدا، ویزینگ، کراکل، تاکی‌پنه، کاهش صداهای ریوی، سایر، بدون نشانه
+- قلب و عروق:
+  درد قفسه سینه، تپش قلب، تنگی نفس ناگهانی شبانه، تنگی نفس در وضعیت خوابیده، سیانوز، سابقه سنکوپ، سایر، بدون علامت
+  S1S2 غیرطبیعی، صداهای اضافی، آریتمی، واریس اندام تحتانی/فوقانی، ادم، سایر، بدون نشانه
+- شکم و لگن:
+  بی‌اشتهایی، تهوع، استفراغ، درد شکم، سوزش سر دل، اسهال، یبوست، مدفوع قیری، خون روشن در مدفوع، اختلال بلع، سایر، بدون علامت
+  تندرنس، ریباند، هپاتومگالی، اسپلنومگالی، آسیت، توده، دیستانسیون، سایر، بدون نشانه
+- کلیه و مجاری ادراری/تناسلی:
+  سوزش ادرار، تکرر، ادرار خونی، درد پهلو، احساس سنگینی/توده بیضه، سایر، بدون علامت
+  CVA tenderness، واریکوسل، سایر، بدون نشانه
+- اسکلتی عضلانی:
+  خشکی مفصل، کمردرد، درد زانو، درد شانه، سایر دردها، سایر، بدون علامت
+  محدودیت حرکت مفصل، کاهش قدرت عضلانی اندام فوقانی/تحتانی، اسکولیوز، آمپوتاسیون، SLR مثبت، Reverse-SLR مثبت، سایر، بدون نشانه
+- سیستم عصبی:
+  سردرد، گیجی، لرزش، اختلال حافظه، تشنج/سابقه صرع، گزگز انگشتان، سایر، بدون علامت
+  رفلکس زانو غیرطبیعی، رفلکس آشیل غیرطبیعی، Romberg مختل، Tremor، اختلال حسی اندام، Tinel مثبت، Phalen مثبت، سایر، بدون نشانه
+- اعصاب و روان:
+  عصبانیت، پرخاشگری، اضطراب، خلق پایین، کاهش انگیزه، سایر، بدون علامت
+  هذیان، توهم، اختلال orientation، سایر، بدون نشانه
+- سایر موارد
+- مشخصات پزشک معاینه‌کننده
+- مهر و امضاء
+- تاریخ معاینه
+
+صفحه 4:
+آزمایش‌ها:
+- تاریخ انجام
+- CBC:
+  WBC, RBC, Hb, HCT, Plt
+- U/A:
+  Prot, Glu, RBC, WBC, Bact
+- FBS
+- Total Chol
+- LDL
+- HDL
+- TG
+- BUN
+- Cr
+- ALT
+- AST
+- ALK.Ph
+- PSA
+- HBS Ag
+- S/E & OB
+- PPD
+- آزمایش‌های تخصصی/واکسیناسیون:
+  حداقل سه ردیف نوع، تاریخ، نتیجه
+پاراکلینیک:
+- اپتومتری
+  - حدت بینایی
+  - دید رنگی
+  - میدان بینایی
+  - R/L
+  - با/بدون اصلاح
+  - طبیعی/غیرطبیعی
+  - دید عمق
+  - Arc seconds
+- اودیومتری
+  - فرکانس‌های 500، 1000، 2000، 3000، 4000، 6000، 8000
+  - SDS
+  - SRT
+  - AC/BC گوش راست و چپ
+  - تفسیر
+- اسپیرومتری
+  - FEV1 مقدار/درصد
+  - FVC مقدار/درصد
+  - FEV1/FVC%
+  - FEF 25-75%
+  - PEF
+  - VEXT / Back Extrapolated Volume
+  - تفسیر
+
+صفحه 5:
+سایر پاراکلینیک:
+- CXR / P-A یافته‌ها
+- تاریخ
+- ECG یافته‌ها
+- تاریخ
+- CT Scan
+- سونوگرافی
+- سایر رادیوگرافی‌ها
+- سایر موارد
+ارجاع/مشاوره:
+- نوع تخصص
+- علت ارجاع
+- تاریخ
+- نتیجه ارجاع
+حداقل دو ردیف در فرم مرجع.
+هشدار:
+«درصورت نیاز به ارجاع، نظریه نهایی منوط به مشخص شدن نتیجه ارجاع خواهد بود.»
+نظریه نهایی پزشک متخصص طب کار در خصوص سلامت شغلی:
+- الف: مانع بلا
+- ب: شروط / ذکر شروط
+- ج: تناسب/عدم صلاحیت پزشکی جهت انجام شغل مورد نظر
+- ذکر علت یا علل رد صلاحیت پزشکی
+- توصیه‌های پزشکی لازم
+مشخصات پزشک متخصص طب کار / ارائه‌دهنده نظر نهایی
+- کد معاینات سلامت شغلی
+- تاریخ
+- مهر و امضاء
+
+الزام:
+ساختار چاپ باید قابل نسخه‌بندی باشد. نباید با CSS/HTML ساده‌ای ساخته شود که با تغییر مرورگر چاپ از فرم خارج شود. برای خروجی قانونی/رسمی باید یک print/PDF rendering کنترل‌شده و تست‌شده داشته باشیم.
+
+====================================================================
+32) Laboratory
+====================================================================
+
+Lab باید:
+- Order
+- Sample
+- Test
+- Result
+- Validation
+- Reference Range
+- Units
+- Technician
+- Timestamp
+- Status
+- Amendment
+را پشتیبانی کند.
+
+نتیجه آزمایش پس از تأیید نباید بدون Audit تغییر کند.
+
+====================================================================
+33) Paraclinic
+====================================================================
+
+حداقل:
+- Optometry
+- Audiometry
+- Spirometry
+- CXR
+- ECG
+- Ultrasound
+- CT
+- Other
+
+هر نوع تست می‌تواند Template/Structured Data داشته باشد.
+
+====================================================================
+34) Referral
+====================================================================
+
+ارجاع باید Entity مستقل باشد.
+
+States:
+- Created
+- Sent
+- Awaiting
+- ResultReceived
+- Reviewed
+- Closed
+یا Stateهای دقیق‌تر.
+
+وقتی پرونده نیاز به ارجاع دارد:
+Final Opinion نباید قبل از دریافت/تعیین تکلیف ارجاع صادر شود، مگر Rule قانونی/پزشکی مشخص اجازه دهد.
+
+====================================================================
+35) Physician Lock
+====================================================================
+
+Physician پس از تکمیل و تأیید پرونده:
+- Finalize
+- Sign/Approve
+- Lock
+
+بعد از Lock:
+- تغییر مستقیم ممنوع
+- Amendment/Versioning لازم
+- Audit کامل
+
+====================================================================
+36) Document Management System
+====================================================================
+
+DMS باید:
+- Upload
+- Download
+- Preview
+- Metadata
+- Version
+- Access Control
+- Link to Entity
+- Retention
+- Audit
+- Optional checksum/integrity
+داشته باشد.
+
+Document می‌تواند به:
+- Company
+- Contract
+- Person
+- Medical Record
+- Referral
+- Ticket
+- Payment
+- Purchase
+- Report
+- Center
+وصل شود.
+
+====================================================================
+37) Ticketing + Knowledge Base
+====================================================================
+
+Ticket:
+- ID
+- Number
+- requester
+- category
+- priority
+- status
+- assignment
+- SLA
+- comments
+- attachments
+- audit
+- escalation
+- resolution
+
+Knowledge Base:
+- Article
+- Category
+- Version
+- Publication state
+- Permissions
+- Search
+
+Ticket می‌تواند به Article لینک شود.
+
+====================================================================
+38) Audit Engine
+====================================================================
+
+برای اقدامات حساس:
+- Login
+- Logout
+- Failed Login
+- Permission changes
+- Medical record view
+- Medical record change
+- Finalization
+- Unlock/Amendment
+- Export
+- Print
+- Document access
+- Financial operations
+- Admin actions
+- Cross-tenant access
+ثبت Audit لازم است.
+
+Audit نباید به‌سادگی قابل حذف/ویرایش توسط کاربران عادی باشد.
+
+====================================================================
+39) Logging / Monitoring
+====================================================================
+
+Log:
+- Application
+- Security
+- Error
+- Performance
+- Integration
+
+با:
+- correlation ID
+- request ID
+- actor context در صورت مجاز بودن
+- timestamp
+- environment
+
+اما بدون Secrets و داده پزشکی غیرضروری.
+
+Monitoring:
+- uptime
+- API latency
+- error rate
+- queue
+- DB health
+- disk
+- memory
+- backup health
+- integration health
+
+====================================================================
+40) Backup / Recovery
+====================================================================
+
+Backup باید:
+- automated
+- encrypted
+- tested
+- monitored
+باشد.
+
+Backup وجود داشتن کافی نیست؛ Restore باید تست شود.
+
+RPO/RTO باید در Deployment/Operations بر اساس SLA محصول تعیین و مستند شود.
+
+====================================================================
+41) API
+====================================================================
+
+API باید:
+- versioned
+- authenticated
+- authorized
+- documented
+- validated
+- rate limited در نقاط حساس
+باشد.
+
+نمونه:
+ /api/v1/...
+
+OpenAPI/Swagger در محیط مناسب ارائه شود.
+
+Error responseها استاندارد باشند.
+
+Idempotency برای عملیات حساس در صورت نیاز.
+
+====================================================================
+42) Authentication
+====================================================================
+
+Authentication باید:
+- Secure session/token strategy
+- MFA-ready
+- Password policy
+- Rate limit
+- Lockout/risk controls
+- Password reset
+- OTP
+- Device/session management
+را پشتیبانی کند.
+
+Secretها در Secret Store/Environment مدیریت شوند.
+
+====================================================================
+43) Notifications / SMS
+====================================================================
+
+برای:
+- OTP
+- Appointment
+- Reminder
+- Payment
+- Workflow transition
+- Referral
+- Result readiness
+و موارد لازم.
+
+Delivery status و retry باید قابل مشاهده و Audit باشد.
+
+====================================================================
+44) Excel / Import
+====================================================================
+
+Employer باید بتواند اطلاعات کارکنان را با Excel وارد کند.
+
+Import باید:
+- template
+- validation
+- preview
+- row-level errors
+- duplicate detection
+- dry-run
+- final commit
+- audit
+داشته باشد.
+
+نباید Excel مستقیماً بدون validation وارد DB شود.
+
+====================================================================
+45) Search
+====================================================================
+
+جستجو باید:
+- permission-aware
+- tenant-aware
+- performant
+باشد.
+
+برای National ID/Case Number/Name/Phone و سایر شناسه‌های مجاز.
+
+====================================================================
+46) CMS / Center Website
+====================================================================
+
+هر Center صفحه وب مستقل دارد.
+
+محتوا باید:
+- مدیریت‌پذیر
+- نسخه‌پذیر
+- Permission-controlled
+- قابل cache
+باشد.
+
+====================================================================
+47) Product Marketing Website
+====================================================================
+
+یک سایت مجزا برای معرفی خود OHIS در نظر گرفته شده است.
+
+این سایت برای مشتریان بالقوه است و باید:
+- Product Overview
+- Features
+- Security
+- Benefits
+- Modules
+- Demo request
+- Contact
+- FAQ
+- Documentation عمومی در صورت نیاز
+را ارائه دهد.
+
+این سایت با Operational App قاطی نشود؛ مرز آن از نظر deployment/maintenance باید واضح باشد.
+
+====================================================================
+48) AI
+====================================================================
+
+AI در OHIS آینده‌نگر است اما نباید به شکل خطرناک وارد تصمیم پزشکی شود.
+
+اصول:
+- AI نباید بدون Governance تصمیم پزشکی نهایی بگیرد.
+- داده برای Training فقط طبق Privacy/Data Ownership Policy.
+- داده‌های مشتریان نباید بدون مجوز برای آموزش مدل عمومی استفاده شوند.
+- Aggregated/anonymized data در صورت مجاز بودن.
+- Explainability و Audit برای AI features.
+- Human-in-the-loop در تصمیم‌های حساس.
+
+کاربردهای آینده:
+- Risk detection
+- Operational prediction
+- Reporting
+- Summarization
+- Anomaly detection
+- Scheduling optimization
+- Knowledge assistant
+نه جایگزینی پزشک.
+
+====================================================================
+49) Roadmap Phase 1–5
+====================================================================
+
+Phase 1 تا 5 قبلاً به صورت تحلیل، معماری، محصول، امنیت، فرم و بازبینی نهایی تکمیل شده‌اند.
+
+قبل از Phase 6:
+- Business analysis
+- Architecture
+- Modules
+- Engines
+- Security
+- Threat Modeling
+- Data Integrity
+- Form/Print analysis
+- Website/Portal
+- Ticketing
+- Future extensibility
+بازبینی شده و Gate نهایی Phase 5 پاس شده است.
+
+هیچ کمبود بنیادی شناخته‌شده‌ای برای شروع implementation وجود ندارد.
+
+====================================================================
+50) Phase 6 — نقشه راه ثابت
+====================================================================
+
+Phase 6.1 — Development Foundation
+- Development environment
+- Git
+- GitHub
+- VS Code
+- Python
+- Node
+- PostgreSQL
+- Docker
+- Coding standards
+- Git standards
+- Folder standards
+- Documentation standards
+- Development workflow
+
+Phase 6.2 — Project Skeleton
+- Repository
+- Django skeleton
+- React skeleton
+- configuration
+- environment
+- Docker foundation
+- compose
+- health check
+- CI foundation
+- documentation foundation
+
+Phase 6.3 — Core Platform
+- User
+- Authentication
+- Authorization
+- Permission Engine
+- Audit
+- Logging
+- Configuration
+- Common library
+- Error handling
+- Exception framework
+
+Phase 6.4 — Infrastructure Layer
+- PostgreSQL
+- Redis
+- Celery
+- File storage
+- Email
+- SMS
+- Cache
+- Queue
+
+Phase 6.5 — Business Foundation
+- Company
+- Contract
+- Occupational Center
+- Organization
+- Doctor
+- Employee
+- Visitor/Examinee
+- Person
+
+Phase 6.6 — Clinical Modules
+- Reception
+- Medical Record
+- Laboratory
+- Paraclinic
+- Occupational Health
+- Doctor Module
+- Referral
+
+Phase 6.7 — Engines
+- Workflow
+- Rules
+- Forms
+- Reports
+- Notification
+- DMS
+- Ticket
+- CMS
+- Scheduler
+- Integration
+- Audit
+
+Phase 6.8 — Financial Platform
+- Cash
+- Bank deposit
+- Receipts
+- Accounting foundation
+- Packages
+- Pricing
+- Employer balance
+- Payment
+
+Phase 6.9 — Frontend
+- React
+- Layout
+- Dashboard
+- Components
+- Theme
+- RTL
+- Persian Calendar
+- Portals
+- Center Websites
+- Product Website boundary
+
+Phase 6.10 — Security Hardening
+- Security tests
+- Threat verification
+- Penetration testing
+- Performance
+- Load testing
+- Abuse testing
+
+Phase 6.11 — Integration
+- SMS
+- Email
+- Payment
+- APIs
+- External systems
+
+Phase 6.12 — Deployment
+- Docker
+- Production
+- Backup
+- Monitoring
+- CI/CD
+- Restore
+
+Phase 6.13 — Acceptance
+- Integration test
+- UAT
+- Bug fix
+- Release Candidate
+- Version 1.0
+
+====================================================================
+51) Development Method
+====================================================================
+
+برای هر Feature:
+
+1. Requirement
+2. Acceptance Criteria
+3. Domain model
+4. Security analysis
+5. Data model
+6. API contract
+7. UI contract
+8. Implementation
+9. Unit tests
+10. Integration tests
+11. Security checks
+12. Documentation
+13. Code Review
+14. Merge
+15. Deployment verification
+
+اگر مرحله‌ای ناقص باشد Feature Done نیست.
+
+====================================================================
+52) Testing Strategy
+====================================================================
+
+سطوح:
+- Unit
+- Integration
+- API
+- Permission
+- Workflow
+- Database
+- Frontend component
+- E2E
+- Security
+- Load/Performance
+- Regression
+
+برای Permission و Medical Data تست‌های منفی اجباری هستند:
+- کاربر غیرمجاز
+- Tenant دیگر
+- Center دیگر
+- Resource locked
+- Expired token
+- Invalid workflow transition
+- Duplicate request
+
+====================================================================
+53) Performance
+====================================================================
+
+Performance از ابتدا لحاظ شود.
+
+اصول:
+- Pagination
+- Indexing
+- Query optimization
+- N+1 prevention
+- Caching
+- Async jobs
+- Background processing
+- Rate limiting
+- Efficient file handling
+
+قبل از Release:
+Load test و profiling.
+
+====================================================================
+54) Database
+====================================================================
+
+PostgreSQL مرجع اصلی است.
+
+اصل:
+- UUID برای Entityهای مناسب و به‌خصوص شناسه‌های قابل expose
+- Constraints
+- Foreign Keys
+- Index
+- Transaction
+- Migration
+- Audit
+- Soft delete فقط در جاهایی که Domain واقعاً نیاز دارد؛ Soft Delete نباید جایگزین Data Lifecycle Policy شود.
+
+Schema باید Domain-oriented باشد.
+
+====================================================================
+55) File/Medical Document Security
+====================================================================
+
+فایل‌ها:
+- direct public URL ممنوع برای داده حساس
+- access-controlled download
+- authorization قبل از دریافت
+- malware scanning در صورت نیاز
+- size/type validation
+- checksum در نقاط حساس
+- retention
+- audit
+- secure storage
+
+====================================================================
+56) Print & PDF
+====================================================================
+
+برای فرم رسمی:
+- exact field mapping
+- page layout
+- Persian typography
+- RTL
+- page breaks
+- headers/footers
+- signature/stamp zones
+- photo
+- tables
+- version
+- print test
+
+باید خروجی روی PDF و چاپ واقعی تست شود.
+
+====================================================================
+57) Data Ownership
+====================================================================
+
+داده‌های هر Tenant/Customer متعلق به همان سازمان طبق قرارداد و قانون است.
+
+Platform Owner حق استفاده آزادانه از داده مشتری برای Training یا فروش ندارد.
+
+Data export و deletion/retention باید مطابق قرارداد و قانون طراحی شود.
+
+====================================================================
+58) Legal/Regulatory
+====================================================================
+
+قوانین مرتبط با:
+- وزارت بهداشت
+- طب کار
+- پرونده پزشکی
+- حریم خصوصی
+- نگهداری سوابق
+- امضای الکترونیک
+- پرداخت
+- پیامک/احراز هویت
+باید در implementation به عنوان constraints بررسی شوند.
+
+اگر قانون تغییر کرد، این یکی از معدود دلایل مجاز برای بازبینی معماری/Requirement است.
+
+====================================================================
+59) Non-Goals / ممنوعات
+====================================================================
+
+در نسخه اول:
+- Microservice architecture را بدون نیاز واقعی پیاده نکن.
+- AI را جایگزین پزشک نکن.
+- Secrets را در Git نگذار.
+- Business Logic را در Frontend قرار نده.
+- Database را از طریق Frontend expose نکن.
+- Medical data را در logs نریز.
+- مستقیم روی main Push نکن.
+- Feature بدون تست را Done اعلام نکن.
+- یک JSON بزرگ برای کل پرونده پزشکی بدون مدل‌سازی Domain ایجاد نکن.
+- Permission را فقط با hide کردن UI پیاده نکن.
+- فایل‌های پزشکی را public URL نده.
+- چاپ فرم را به browser default واگذار نکن.
+
+====================================================================
+60) وضعیت فعلی Implementation
+====================================================================
+
+Phase 6.1:
+تکمیل شده/محیط توسعه آماده شده است.
+
+Phase 6.2:
+آغاز شده است.
+
+کارهای انجام‌شده در مسیر:
+- Git
+- GitHub
+- VS Code
+- Python
+- Node.js
+- PostgreSQL
+- Docker
+- Workspace
+- Monorepo concept
+- ساختار ریشه
+- README
+- LICENSE
+- .gitignore
+- Git workflow
+
+کاربر در خانه Commit/Push انجام داده و از سیستم اداره با git pull پروژه را دریافت می‌کند.
+
+AI Agent باید فرض نکند که فایل‌ها در هر دو سیستم دقیقاً یکسان‌اند؛ وضعیت واقعی Repository را با Git بررسی کند.
+
+====================================================================
+61) Workspace
+====================================================================
+
+نمونه محیط توسعه Windows:
+
+D:\Projects\OHIS
+
+ریشه Repository همان OHIS است.
+
+برای چند سیستم:
+- GitHub مرجع Repository
+- Pull برای دریافت
+- Push برای ارسال
+- feature branch برای کار
+- PR برای merge
+
+====================================================================
+62) مستندات
+====================================================================
+
+docs/
+├── architecture/
+├── api/
+├── database/
+├── security/
+├── deployment/
+├── user-guides/
+├── developer-guides/
+└── adr/
+
+ADRها باید برای تصمیمات مهم ثبت شوند.
+
+نمونه:
+ADR-0001 Django
+ADR-0002 PostgreSQL
+ADR-0003 UUID
+ADR-0004 Modular Monolith
+ADR-0005 Multi-tenancy
+ADR-0006 Form/Print Strategy
+و غیره.
+
+====================================================================
+63) Release Philosophy
+====================================================================
+
+نسخه‌ها:
+0.x برای development
+1.0.0 برای اولین Release واقعی
+
+Release Candidate باید:
+- Security
+- Performance
+- Backup/Restore
+- UAT
+- Regression
+را پاس کند.
+
+====================================================================
+64) Agent Operating Procedure
+====================================================================
+
+AI Agent در هر جلسه:
+
+1. وضعیت Git را بررسی کن.
+2. Branch را بررسی کن.
+3. Repository structure را بررسی کن.
+4. ADR/Docs مرتبط را بخوان.
+5. Requirement را مشخص کن.
+6. Acceptance Criteria را مشخص کن.
+7. Security impact را مشخص کن.
+8. Implementation plan کوتاه بساز.
+9. تغییرات کوچک انجام بده.
+10. Tests اجرا کن.
+11. Lint/Format اجرا کن.
+12. Security checks مرتبط اجرا کن.
+13. Documentation را به‌روز کن.
+14. Diff را review کن.
+15. Commit message مناسب بساز.
+16. در صورت نیاز PR ایجاد کن.
+17. گزارش دقیق تغییرات و تست‌ها بده.
+
+هیچ‌گاه صرفاً بگو «انجام شد» بدون اینکه وضعیت واقعی تست/Build را بررسی کرده باشی.
+
+====================================================================
+65) Agent Memory / Continuity
+====================================================================
+
+این پروژه طولانی‌مدت است.
+
+Agent باید:
+- ADRها
+- CHANGELOG
+- docs
+- task state
+را به عنوان حافظه پروژه نگه دارد.
+
+هیچ تصمیم مهمی نباید فقط در Chat باقی بماند.
+
+پیشنهاد فایل‌های دائمی:
+docs/project-status.md
+docs/architecture/README.md
+docs/decisions/
+docs/security/threat-model.md
+docs/database/data-model.md
+docs/development/workflow.md
+CHANGELOG.md
+
+====================================================================
+66) معیار موفقیت OHIS
+====================================================================
+
+موفقیت فقط «کار کردن نرم‌افزار» نیست.
+
+OHIS باید:
+- امن باشد
+- قابل اعتماد باشد
+- داده را صحیح نگه دارد
+- قابل Audit باشد
+- قابل توسعه باشد
+- قابل تست باشد
+- قابل استقرار باشد
+- قابل پشتیبانی باشد
+- قابل آموزش باشد
+- برای چند مرکز/سازمان قابل استفاده باشد
+- در آینده بتواند AI/BI/Payroll/Insurance/Tax/Mobile/Integration را بدون بازطراحی بنیادی جذب کند.
+
+====================================================================
+67) اصل نهایی
+====================================================================
+
+OHIS پروژه‌ای آموزشی و در عین حال محصول واقعی است.
+
+هر چیزی که توسعه می‌دهی باید دو هدف را همزمان برآورده کند:
+
+1. بخشی از محصول واقعی باشد.
+2. قابل فهم و قابل نگهداری برای توسعه‌دهنده انسانی باشد.
+
+هدف نهایی این نیست که AI تمام کد را تولید کند و انسان چیزی نداند.
+
+هدف:
+ساخت OHIS با کمک AI و ساختن دانش مهندسی قابل انتقال، مستند و قابل ادامه.
+
+====================================================================
+68) خروجی مورد انتظار از AI Coding Agent
+====================================================================
+
+Agent باید در طول پروژه این خروجی‌ها را تولید و نگهداری کند:
+
+- Source code
+- Tests
+- API docs
+- Database migrations
+- Architecture docs
+- ADRs
+- Security docs
+- Threat model
+- Deployment configs
+- Docker configs
+- CI/CD
+- Backup/Restore scripts
+- User guides
+- Developer guides
+- Changelog
+- Release notes
+- Seed/demo data غیرحساس
+- Test data
+- Operational runbooks
+
+====================================================================
+69) شروع کار از همین سند
+====================================================================
+
+اگر Repository موجود است:
+1. git status
+2. git branch
+3. git remote -v
+4. git log --oneline -10
+5. ساختار Repository را بررسی کن.
+
+اگر Repository موجود نیست:
+- طبق ساختار canonical این سند ایجاد کن.
+
+سپس Phase 6.2 را ادامه بده.
+
+اولویت فعلی:
+Project Skeleton → Backend Foundation → Configuration → Docker → Health Check → CI Foundation
+
+تا زمانی که Foundation پایدار نشده:
+- Business modules را شروع نکن.
+- Featureهای UI را پراکنده شروع نکن.
+
+====================================================================
+70) مهم‌ترین تصمیم‌های نهایی
+====================================================================
+
+- Monorepo
+- Modular Monolith
+- Django Backend
+- React Frontend
+- PostgreSQL
+- Redis
+- Celery/Task Queue
+- Docker
+- Clean Architecture
+- DDD-ready
+- Internal Events
+- RBAC + scoped authorization
+- Multi-tenancy
+- Security/Privacy by Design
+- Audit
+- DMS
+- Workflow Engine
+- Rule Engine
+- Form Engine
+- Report Engine
+- Notification Engine
+- Financial Engine
+- Ticket Engine
+- CMS Engine
+- Scheduler Engine
+- Integration Engine
+- Audit Engine
+- Website per Center
+- Product Marketing Website
+- Online Booking
+- Patient Portal
+- Employer Portal
+- Official medical occupational form reproduction/print
+- Future AI with governance
+- Fixed Phase 6 roadmap
+- Quality over speed
+
+====================================================================
+END OF MASTER HANDOFF
+====================================================================
