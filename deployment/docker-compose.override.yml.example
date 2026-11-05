@@ -1,0 +1,14 @@
+# Local developer override example
+# Copy this file to docker-compose.override.yml for local debugging (git-ignored)
+version: '3.9'
+
+services:
+  backend:
+    command: python manage.py runserver 0.0.0.0:8000
+    environment:
+      - DJANGO_SETTINGS_MODULE=config.settings.development
+      - DEBUG=1
+    volumes:
+      - ./backend:/app
+    ports:
+      - "8000:8000"
