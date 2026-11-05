@@ -1,16 +1,19 @@
 """
-Django settings for OHIS (Occupational Health Information System).
+Base settings for OHIS (Occupational Health Information System).
+Shared configuration across all deployment environments.
 Modular Monolith with PostgreSQL, Redis, Celery, and SimpleJWT.
 """
 import os
 from pathlib import Path
 from datetime import timedelta
 
+# Build paths inside the project like this: BASE_DIR / 'subdir'.
+# BASE_DIR points to backend/
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
 
-SECRET_KEY = os.environ.get('SECRET_KEY', 'ohis-dev-secret-key-change-in-production')
-DEBUG = os.environ.get('DEBUG', '1') == '1'
-ALLOWED_HOSTS = os.environ.get('ALLOWED_HOSTS', '*').split(',')
+SECRET_KEY = os.environ.get('SECRET_KEY')
+DEBUG = False
+ALLOWED_HOSTS = [h.strip() for h in os.environ.get('ALLOWED_HOSTS', '').split(',') if h.strip()]
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -20,7 +23,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
 
-    # Third-party
+    # Third-party packages
     'rest_framework',
     'rest_framework_simplejwt',
     'corsheaders',
@@ -28,12 +31,10 @@ INSTALLED_APPS = [
     'drf_spectacular',
     'django_celery_beat',
 
-    # OHIS Core & Apps
-    'core',
+    # OHIS Architectural Foundation & Apps
+    'core.apps.CoreConfig',
+    'common.apps.CommonConfig',
     'apps.clinical',
-    'apps.contracts',
-    'apps.finance',
-    'apps.ticketing',
 ]
 
 MIDDLEWARE = [
@@ -66,14 +67,15 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'config.wsgi.application'
+ASGI_APPLICATION = 'config.asgi.application'
 
 # Database: PostgreSQL
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': os.environ.get('DB_NAME', 'ohis_db'),
-        'USER': os.environ.get('DB_USER', 'ohis_admin'),
-        'PASSWORD': os.environ.get('DB_PASSWORD', 'secure_ohis_secret_2026'),
+        'NAME': os.environ.get('DB_NAME'),
+        'USER': os.environ.get('DB_USER'),
+        'PASSWORD': os.environ.get('DB_PASSWORD'),
         'HOST': os.environ.get('DB_HOST', 'localhost'),
         'PORT': os.environ.get('DB_PORT', '5432'),
     }
@@ -83,13 +85,13 @@ DATABASES = {
 CACHES = {
     'default': {
         'BACKEND': 'django.core.cache.backends.redis.RedisCache',
-        'LOCATION': os.environ.get('REDIS_URL', 'redis://127.0.0.1:6379/1'),
+        'LOCATION': os.environ.get('REDIS_URL', 'redis://localhost:6379/1'),
     }
 }
 
 # Celery Configuration
-CELERY_BROKER_URL = os.environ.get('CELERY_BROKER_URL', 'redis://127.0.0.1:6379/0')
-CELERY_RESULT_BACKEND = os.environ.get('CELERY_RESULT_BACKEND', 'redis://127.0.0.1:6379/0')
+CELERY_BROKER_URL = os.environ.get('CELERY_BROKER_URL', 'redis://localhost:6379/0')
+CELERY_RESULT_BACKEND = os.environ.get('CELERY_RESULT_BACKEND', 'redis://localhost:6379/0')
 CELERY_TIMEZONE = 'Asia/Tehran'
 
 # Django REST Framework & SimpleJWT
@@ -119,10 +121,19 @@ TIME_ZONE = 'Asia/Tehran'
 USE_I18N = True
 USE_TZ = True
 
+# Static & Media Files
 STATIC_URL = '/static/'
 STATIC_ROOT = BASE_DIR / 'staticfiles'
+STATICFILES_DIRS = [p for p in [BASE_DIR / 'static'] if p.exists()]
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
-CORS_ALLOW_ALL_ORIGINS = True
+
+# CORS Configuration
+CORS_ALLOW_ALL_ORIGINS = False
+CORS_ALLOWED_ORIGINS = [
+    origin.strip()
+    for origin in os.environ.get('CORS_ALLOWED_ORIGINS', 'http://localhost:3000').split(',')
+    if origin.strip()
+]
