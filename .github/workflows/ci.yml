@@ -43,10 +43,10 @@ jobs:
           fetch-depth: 0
           persist-credentials: false
 
-      - name: Set up Python Runtime (Target 3.11.18)
+      - name: Set up Python Runtime (Target 3.11)
         uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5.6.0
         with:
-          python-version: '3.11.18'
+          python-version: '3.11'
           cache: 'pip'
 
       - name: Install Backend Dependencies with Constraints
@@ -85,12 +85,14 @@ jobs:
       - name: Django System Checks (Development, Testing, Staging, Production)
         env:
           SECRET_KEY: temporary-ci-validation-secret-key-12345
+          ALLOWED_HOSTS: localhost,127.0.0.1
+          CORS_ALLOWED_ORIGINS: http://localhost:3000
           DB_NAME: ohis_test_db
           DB_USER: test_user
           DB_PASSWORD: test_password_secure_123
-          DB_HOST: localhost
+          DB_HOST: 127.0.0.1
           DB_PORT: 5432
-          REDIS_URL: redis://localhost:6379/1
+          REDIS_URL: redis://127.0.0.1:6379/1
         run: |
           cd backend
           python manage.py check --settings=config.settings.development
@@ -101,12 +103,14 @@ jobs:
       - name: Run Backend Integration Tests (Live PostgreSQL and Redis)
         env:
           PYTHONPATH: backend
+          SECRET_KEY: temporary-ci-validation-secret-key-12345
+          ALLOWED_HOSTS: localhost,127.0.0.1
           DB_NAME: ohis_test_db
           DB_USER: test_user
           DB_PASSWORD: test_password_secure_123
-          DB_HOST: localhost
+          DB_HOST: 127.0.0.1
           DB_PORT: 5432
-          REDIS_URL: redis://localhost:6379/1
+          REDIS_URL: redis://127.0.0.1:6379/1
         run: |
           PYTHONPATH=backend pytest tests/integration/ -v
 
