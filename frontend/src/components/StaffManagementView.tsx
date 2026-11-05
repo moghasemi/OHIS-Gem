@@ -35,7 +35,7 @@ export const StaffManagementView: React.FC = () => {
   const [lastName, setLastName] = useState('');
   const [nationalId, setNationalId] = useState('');
   const [mobile, setMobile] = useState('');
-  const [role, setRole] = useState<UserRole>('DOCTOR');
+  const [role, setRole] = useState<UserRole>('doctor');
   const [roleTitle, setRoleTitle] = useState('');
   const [department, setDepartment] = useState('');
   const [medicalCouncilNumber, setMedicalCouncilNumber] = useState('');
@@ -57,10 +57,10 @@ export const StaffManagementView: React.FC = () => {
     return matchesRole && matchesSearch;
   });
 
-  const doctorsCount = staffList.filter((s) => s.role === 'DOCTOR').length;
-  const hseCount = staffList.filter((s) => s.role === 'HSE').length;
-  const paraLabCount = staffList.filter((s) => s.role === 'PARACLINIC' || s.role === 'LAB').length;
-  const receptionCount = staffList.filter((s) => s.role === 'RECEPTION' || s.role === 'CLINIC_ADMIN').length;
+  const doctorsCount = staffList.filter((s) => s.role === 'doctor').length;
+  const hseCount = staffList.filter((s) => s.role === 'hse').length;
+  const paraLabCount = staffList.filter((s) => s.role === 'para' || s.role === 'lab').length;
+  const receptionCount = staffList.filter((s) => s.role === 'reception' || s.role === 'clinic_admin').length;
 
   const handleToggleStatus = (id: string) => {
     setStaffList((prev) =>
@@ -91,21 +91,21 @@ export const StaffManagementView: React.FC = () => {
       return;
     }
 
-    if (role === 'DOCTOR' && !medicalCouncilNumber.trim()) {
+    if (role === 'doctor' && !medicalCouncilNumber.trim()) {
       setFormError('برای پرسنل در رده پزشک، درج شماره نظام پزشکی معتبر الزامی است.');
       return;
     }
 
     const defaultPrefix =
-      role === 'DOCTOR'
+      role === 'doctor'
         ? 'DOC'
-        : role === 'HSE'
+        : role === 'hse'
         ? 'HSE'
-        : role === 'LAB'
+        : role === 'lab'
         ? 'LAB'
-        : role === 'PARACLINIC'
+        : role === 'para'
         ? 'PARA'
-        : role === 'RECEPTION'
+        : role === 'reception'
         ? 'REC'
         : 'ADM';
 
@@ -119,31 +119,31 @@ export const StaffManagementView: React.FC = () => {
       role,
       roleTitle:
         roleTitle.trim() ||
-        (role === 'DOCTOR'
+        (role === 'doctor'
           ? 'پزشک معاین طب کار'
-          : role === 'HSE'
+          : role === 'hse'
           ? 'کارشناس بهداشت حرفه‌ای'
-          : role === 'PARACLINIC'
+          : role === 'para'
           ? 'تکنسین پاراکلینیک'
-          : role === 'LAB'
+          : role === 'lab'
           ? 'کارشناس آزمایشگاه'
-          : role === 'RECEPTION'
+          : role === 'reception'
           ? 'متصدی پذیرش و صندوق'
           : 'مدیر داخلی مرکز'),
       department:
         department.trim() ||
-        (role === 'DOCTOR'
+        (role === 'doctor'
           ? 'معاینات بالینی و صدور نظریه'
-          : role === 'HSE'
+          : role === 'hse'
           ? 'بهداشت حرفه‌ای و ارزیابی مواجهات'
-          : role === 'PARACLINIC'
+          : role === 'para'
           ? 'واحد تست‌های فیزیولوژیک'
-          : role === 'LAB'
+          : role === 'lab'
           ? 'آزمایشگاه تشخیص طبی'
           : 'پذیرش و بایگانی'),
-      medicalCouncilNumber: role === 'DOCTOR' ? medicalCouncilNumber.trim() : undefined,
-      hseLicenseNumber: role === 'HSE' || role === 'PARACLINIC' || role === 'LAB' ? hseLicenseNumber.trim() : undefined,
-      stampNumber: role === 'DOCTOR' ? stampNumber.trim() || `STAMP-${medicalCouncilNumber.trim()}` : undefined,
+      medicalCouncilNumber: role === 'doctor' ? medicalCouncilNumber.trim() : undefined,
+      hseLicenseNumber: role === 'hse' || role === 'para' || role === 'lab' ? hseLicenseNumber.trim() : undefined,
+      stampNumber: role === 'doctor' ? stampNumber.trim() || `STAMP-${medicalCouncilNumber.trim()}` : undefined,
       shift,
       status: 'ACTIVE',
       hireDate: '۱۴۰۵/۰۴/۰۱',
@@ -485,12 +485,12 @@ export const StaffManagementView: React.FC = () => {
                     onChange={(e) => setRole(e.target.value as UserRole)}
                     className="w-full border border-slate-300 rounded-lg p-2.5 bg-white font-bold"
                   >
-                    <option value="DOCTOR">پزشک متخصص طب کار / معتمد</option>
-                    <option value="HSE">کارشناس بهداشت حرفه‌ای (HSE)</option>
-                    <option value="PARACLINIC">اپراتور ادیومتری و پاراکلینیک</option>
-                    <option value="LAB">سوپروایزر / کارشناس آزمایشگاه</option>
-                    <option value="RECEPTION">مسئول پذیرش و صندوق</option>
-                    <option value="CLINIC_ADMIN">مدیر فنی و اجرایی مرکز</option>
+                    <option value="doctor">پزشک متخصص طب کار / معتمد</option>
+                    <option value="hse">کارشناس بهداشت حرفه‌ای (HSE)</option>
+                    <option value="para">اپراتور ادیومتری و پاراکلینیک</option>
+                    <option value="lab">سوپروایزر / کارشناس آزمایشگاه</option>
+                    <option value="reception">مسئول پذیرش و صندوق</option>
+                    <option value="clinic_admin">مدیر فنی و اجرایی مرکز</option>
                   </select>
                 </div>
                 <div>
@@ -508,7 +508,7 @@ export const StaffManagementView: React.FC = () => {
               </div>
 
               {/* Doctor-Specific Fields */}
-              {role === 'DOCTOR' && (
+              {role === 'doctor' && (
                 <div className="p-3 bg-blue-50/70 border border-blue-200 rounded-xl space-y-3">
                   <div className="font-bold text-blue-900 flex items-center gap-1.5">
                     <Stethoscope className="w-4 h-4 text-blue-700" />
@@ -541,7 +541,7 @@ export const StaffManagementView: React.FC = () => {
               )}
 
               {/* HSE or Paraclinic/Lab license */}
-              {(role === 'HSE' || role === 'PARACLINIC' || role === 'LAB') && (
+              {(role === 'hse' || role === 'para' || role === 'lab') && (
                 <div>
                   <label className="block font-bold text-slate-700 mb-1">شماره پروانه صلاحیت حرفه‌ای بهداشت / نظام پزشکی</label>
                   <input

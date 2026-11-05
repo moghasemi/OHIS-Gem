@@ -49,6 +49,7 @@ export const OrgPortalView: React.FC<Props> = ({ patients }) => {
       packageType: newPackageType,
       startDate: newStartDate,
       endDate: newEndDate,
+      status: 'فعال',
       totalAmount: Number(newTotalAmount) || 200000000,
     };
     setContracts([created, ...contracts]);
