@@ -88,10 +88,15 @@ def scan_git_history(all_refs: bool = True) -> List[Dict[str, Any]]:
             errors="replace"
         )
         current_commit = "HEAD"
+        current_file = ""
         for line in proc.stdout:
             if line.startswith("commit "):
                 current_commit = line.strip().split()[1]
+            elif line.startswith("+++ b/"):
+                current_file = line[6:].strip()
             elif line.startswith("+") and not line.startswith("+++"):
+                if current_file in ALLOWLIST_PATHS:
+                    continue
                 added_line = line[1:]
                 for pattern_name, regex in SECRET_PATTERNS:
                     matches = regex.finditer(added_line)
@@ -101,7 +106,7 @@ def scan_git_history(all_refs: bool = True) -> List[Dict[str, Any]]:
                             continue
                         findings.append({
                             "pattern": pattern_name,
-                            "location": f"commit {current_commit[:8]}",
+                            "location": f"commit {current_commit[:8]}:{current_file}",
                             "masked": mask_secret(matched_val),
                         })
         proc.wait()
