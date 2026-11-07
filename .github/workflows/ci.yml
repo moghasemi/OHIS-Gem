@@ -103,6 +103,7 @@ jobs:
           python manage.py check --settings=config.settings.testing
           python manage.py check --settings=config.settings.staging
           python manage.py check --settings=config.settings.production
+          python manage.py makemigrations --check --dry-run
 
       - name: Run Backend Integration Tests (Live PostgreSQL and Redis)
         env:
@@ -146,12 +147,12 @@ jobs:
 
       - name: Verify Gunicorn Is Installed in the Production Image
         run: |
-          docker compose --env-file deployment/ci.env run --rm backend gunicorn --version
+          docker compose --env-file deployment/ci.env run --no-deps --rm backend gunicorn --version
 
       - name: Run Django System Checks inside the Built Docker Container
         run: |
-          docker compose --env-file deployment/ci.env run --rm backend python manage.py check --settings=config.settings.development
-          docker compose --env-file deployment/ci.env run --rm backend python manage.py check --settings=config.settings.production
+          docker compose --env-file deployment/ci.env run --no-deps --rm backend python manage.py check --settings=config.settings.development
+          docker compose --env-file deployment/ci.env run --no-deps --rm backend python manage.py check --settings=config.settings.production
 
       - name: Clean Temporary CI Environment File
         if: always()
