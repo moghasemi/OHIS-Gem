@@ -11,8 +11,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     curl \
     && rm -rf /var/lib/apt/lists/*
 
-COPY requirements/base.txt requirements/constraints.txt /app/requirements/
-RUN pip install --no-cache-dir -r requirements/base.txt -c requirements/constraints.txt && pip check
+COPY requirements/base.txt requirements/production.txt requirements/constraints.txt /app/requirements/
+RUN pip install --no-cache-dir -r requirements/production.txt -c requirements/constraints.txt && pip check
 
 COPY . /app/
 

@@ -30,3 +30,8 @@ deployment/ci.env
 .vscode/
 .idea/
 .playwright-cli/
+
+# Runtime data and generated assets
+/backend/media/
+/backend/staticfiles/
+*.sqlite3

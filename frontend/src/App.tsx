@@ -24,16 +24,8 @@ import { LoginView, AuthenticatedUser } from './components/LoginView.tsx';
 import { ROLE_PERMISSIONS } from './domain/rules.ts';
 
 export default function App() {
-  const [currentUser, setCurrentUser] = useState<AuthenticatedUser | null>({
-    id: 'usr-1',
-    name: 'دکتر محمدرضا صادقی',
-    nationalId: '0071234567',
-    role: 'doctor',
-    roleTitle: 'متخصص طب کار و بیماری‌های شغلی (مسئول فنی)',
-    department: 'معاینات بالینی و صدور نظریه نهایی',
-    medicalCouncilNumber: '۹۸۷۶۵',
-    token: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.active_session_token',
-  });
+  // No authenticated session until a server-backed login exists.
+  const [currentUser, setCurrentUser] = useState<AuthenticatedUser | null>(null);
   const [currentRole, setCurrentRole] = useState<UserRole>('doctor');
   const [customMatrix, setCustomMatrix] = useState<Record<UserRole, string[]>>(ROLE_PERMISSIONS);
   const [currentTab, setCurrentTab] = useState<string>('dashboard');

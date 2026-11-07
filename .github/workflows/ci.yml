@@ -48,6 +48,10 @@ jobs:
         with:
           python-version: '3.11'
           cache: 'pip'
+          cache-dependency-path: |
+            backend/requirements/development.txt
+            backend/requirements/testing.txt
+            backend/requirements/constraints.txt
 
       - name: Install Backend Dependencies with Constraints
         run: |
@@ -140,9 +144,14 @@ jobs:
         run: |
           docker compose --env-file deployment/ci.env build backend
 
-      - name: Run Django System Check inside Built Docker Container
+      - name: Verify Gunicorn Is Installed in the Production Image
+        run: |
+          docker compose --env-file deployment/ci.env run --rm backend gunicorn --version
+
+      - name: Run Django System Checks inside the Built Docker Container
         run: |
           docker compose --env-file deployment/ci.env run --rm backend python manage.py check --settings=config.settings.development
+          docker compose --env-file deployment/ci.env run --rm backend python manage.py check --settings=config.settings.production
 
       - name: Clean Temporary CI Environment File
         if: always()

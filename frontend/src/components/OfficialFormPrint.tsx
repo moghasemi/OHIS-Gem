@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Patient } from '../types/index.ts';
-import { Printer, ArrowRight, Eye, CheckSquare, Square, Download, ShieldCheck } from 'lucide-react';
+import { Printer, ArrowRight, Eye, CheckSquare, Square, Download } from 'lucide-react';
 
 interface Props {
   patient: Patient;
@@ -14,9 +14,9 @@ export const OfficialFormPrint: React.FC<Props> = ({ patient, onBack }) => {
     window.print();
   };
 
-  const renderCheck = (checked: boolean) => (
+  const renderCheck = (checked: boolean | undefined) => (
     <span className="inline-flex items-center mx-1 font-bold">
-      {checked ? '☑' : '☐'}
+      {checked === undefined ? '—' : checked ? '☑' : '☐'}
     </span>
   );
 
@@ -106,7 +106,7 @@ export const OfficialFormPrint: React.FC<Props> = ({ patient, onBack }) => {
                 <div className="col-span-3 border border-black p-2 space-y-2 text-[10px]">
                   <div><strong>تاریخ:</strong> {patient.examinationDate}</div>
                   <div><strong>شماره پرونده:</strong> {patient.dossierNumber}</div>
-                  <div><strong>شماره استخدامی:</strong> EMP-1024</div>
+                  <div><strong>شماره استخدامی:</strong> ثبت نشده</div>
                 </div>
               </div>
             </div>
@@ -170,10 +170,10 @@ export const OfficialFormPrint: React.FC<Props> = ({ patient, onBack }) => {
                   </tr>
                   <tr className="border-b border-black">
                     <td className="border-l border-black p-1 font-bold" rowSpan={2}>مشاغل قبلی</td>
-                    <td className="border-l border-black p-1">{patient.jobHistories[1]?.title || 'کمک انباردار'}</td>
-                    <td className="border-l border-black p-1">{patient.jobHistories[1]?.duty || 'بسته‌بندی و بارگیری'}</td>
+                    <td className="border-l border-black p-1">{patient.jobHistories[1]?.title || 'ثبت نشده'}</td>
+                    <td className="border-l border-black p-1">{patient.jobHistories[1]?.duty || 'ثبت نشده'}</td>
                     <td className="border-l border-black p-1">۱۳۹۶ تا ۱۳۹۹</td>
-                    <td className="p-1">{patient.jobHistories[1]?.changeReason || 'ارتقای شغلی'}</td>
+                    <td className="p-1">{patient.jobHistories[1]?.changeReason || 'ثبت نشده'}</td>
                   </tr>
                   <tr>
                     <td className="border-l border-black p-1">—</td>
@@ -210,7 +210,7 @@ export const OfficialFormPrint: React.FC<Props> = ({ patient, onBack }) => {
                       <div>{renderCheck(patient.hseHazards.physical.includes('اشعه غیر یونیزان'))} اشعه غیر یونیزان</div>
                       <div>{renderCheck(patient.hseHazards.physical.includes('اشعه یونیزان'))} اشعه یونیزان</div>
                       <div>{renderCheck(patient.hseHazards.physical.includes('استرس حرارتی'))} استرس حرارتی</div>
-                      <div>{renderCheck(false)} سایر</div>
+                      <div>{renderCheck(undefined)} سایر</div>
                     </td>
                     <td className="border-l border-black p-1 space-y-0.5">
                       <div>{renderCheck(patient.hseHazards.chemical.includes('گردوغبار'))} گردوغبار</div>
@@ -221,44 +221,44 @@ export const OfficialFormPrint: React.FC<Props> = ({ patient, onBack }) => {
                       <div>{renderCheck(patient.hseHazards.chemical.includes('گازها'))} گازها</div>
                     </td>
                     <td className="border-l border-black p-1 space-y-0.5">
-                      <div>{renderCheck(false)} گزش</div>
-                      <div>{renderCheck(false)} باکتری</div>
-                      <div>{renderCheck(false)} ویروس</div>
-                      <div>{renderCheck(false)} انگل</div>
-                      <div>{renderCheck(false)} سایر</div>
+                      <div>{renderCheck(undefined)} گزش</div>
+                      <div>{renderCheck(undefined)} باکتری</div>
+                      <div>{renderCheck(undefined)} ویروس</div>
+                      <div>{renderCheck(undefined)} انگل</div>
+                      <div>{renderCheck(undefined)} سایر</div>
                     </td>
                     <td className="border-l border-black p-1 space-y-0.5">
                       <div>{renderCheck(patient.hseHazards.ergonomic.includes('ایستادن طولانی مدت'))} ایستادن یا نشستن طولانی</div>
                       <div>{renderCheck(patient.hseHazards.ergonomic.includes('کار تکراری'))} کار تکراری</div>
                       <div>{renderCheck(patient.hseHazards.ergonomic.includes('حمل و نقل بار سنگین'))} حمل و نقل بار سنگین</div>
                       <div>{renderCheck(patient.hseHazards.ergonomic.includes('وضعیت نامناسب بدن'))} وضعیت نامناسب بدن</div>
-                      <div>{renderCheck(false)} سایر</div>
+                      <div>{renderCheck(undefined)} سایر</div>
                     </td>
                     <td className="p-1 space-y-0.5">
                       <div>{renderCheck(patient.hseHazards.psychological.includes('نوبت‌کاری'))} نوبت‌کاری</div>
                       <div>{renderCheck(patient.hseHazards.psychological.includes('استرسورهای شغلی'))} استرسورهای شغلی</div>
-                      <div>{renderCheck(false)} سایر</div>
+                      <div>{renderCheck(undefined)} سایر</div>
                     </td>
                   </tr>
                   <tr className="border-b border-black align-top">
                     <td className="border-l border-black p-1 font-bold text-center">مشاغل قبلی</td>
                     <td className="border-l border-black p-1 space-y-0.5">
-                      <div>{renderCheck(false)} سر و صدا</div>
-                      <div>{renderCheck(false)} ارتعاش</div>
-                      <div>{renderCheck(false)} اشعه غیر یونیزان/یونیزان</div>
+                      <div>{renderCheck(undefined)} سر و صدا</div>
+                      <div>{renderCheck(undefined)} ارتعاش</div>
+                      <div>{renderCheck(undefined)} اشعه غیر یونیزان/یونیزان</div>
                     </td>
                     <td className="border-l border-black p-1 space-y-0.5">
-                      <div>{renderCheck(true)} گردوغبار</div>
-                      <div>{renderCheck(false)} دمه فلزات/حلال</div>
+                      <div>{renderCheck(undefined)} گردوغبار</div>
+                      <div>{renderCheck(undefined)} دمه فلزات/حلال</div>
                     </td>
                     <td className="border-l border-black p-1 space-y-0.5">
-                      <div>{renderCheck(false)} بیولوژیک</div>
+                      <div>{renderCheck(undefined)} بیولوژیک</div>
                     </td>
                     <td className="border-l border-black p-1 space-y-0.5">
-                      <div>{renderCheck(true)} حمل و نقل بار سنگین</div>
+                      <div>{renderCheck(undefined)} حمل و نقل بار سنگین</div>
                     </td>
                     <td className="p-1 space-y-0.5">
-                      <div>{renderCheck(false)} روانی</div>
+                      <div>{renderCheck(undefined)} روانی</div>
                     </td>
                   </tr>
                 </tbody>
@@ -381,10 +381,10 @@ export const OfficialFormPrint: React.FC<Props> = ({ patient, onBack }) => {
                     <tr className="border-b border-black">
                       <td className="border-l border-black p-1 font-bold text-center">عمومی</td>
                       <td className="border-l border-black p-1">
-                        کاهش وزن، کاهش اشتها، خستگی مزمن، اختلال در خواب، تعریق، عدم تحمل گرما/سرما، تب {renderCheck(true)} بدون علامت
+                        {patient.systemExams?.['عمومی']?.symptoms?.join('، ') || 'ثبت نشده'} {renderCheck(patient.systemExams?.['عمومی'] ? patient.systemExams['عمومی'].noSymptoms : undefined)} بدون علامت
                       </td>
                       <td className="border-l border-black p-1">
-                        وضعیت ظاهری (toxic/ill)، مخاطات رنگ‌پریده {renderCheck(true)} بدون نشانه
+                        {patient.systemExams?.['عمومی']?.signs?.join('، ') || 'ثبت نشده'} {renderCheck(patient.systemExams?.['عمومی'] ? patient.systemExams['عمومی'].noSigns : undefined)} بدون نشانه
                       </td>
                       <td className="p-1 text-slate-700">وضعیت عمومی نرمال</td>
                     </tr>
@@ -393,10 +393,10 @@ export const OfficialFormPrint: React.FC<Props> = ({ patient, onBack }) => {
                     <tr className="border-b border-black">
                       <td className="border-l border-black p-1 font-bold text-center">چشم</td>
                       <td className="border-l border-black p-1">
-                        کاهش حدت بینایی، تاری دید، خستگی چشم، دوبینی، سوزش، خارش، ترس از نور {renderCheck(true)} بدون علامت
+                        {patient.systemExams?.['چشم']?.symptoms?.join('، ') || 'ثبت نشده'} {renderCheck(patient.systemExams?.['چشم'] ? patient.systemExams['چشم'].noSymptoms : undefined)} بدون علامت
                       </td>
                       <td className="border-l border-black p-1">
-                        رفلکس مردمک غیرطبیعی، قرمزی، اسکلرای ایکتریک، نیستاگموس {renderCheck(true)} بدون نشانه
+                        {patient.systemExams?.['چشم']?.signs?.join('، ') || 'ثبت نشده'} {renderCheck(patient.systemExams?.['چشم'] ? patient.systemExams['چشم'].noSigns : undefined)} بدون نشانه
                       </td>
                       <td className="p-1 text-slate-700">مردمک‌ها قرینه و با واکنش طبیعی به نور</td>
                     </tr>
@@ -405,10 +405,10 @@ export const OfficialFormPrint: React.FC<Props> = ({ patient, onBack }) => {
                     <tr className="border-b border-black">
                       <td className="border-l border-black p-1 font-bold text-center">پوست، مو و ناخن</td>
                       <td className="border-l border-black p-1">
-                        خارش، ریزش مو، قرمزی، تغییر رنگ پوست، زخم مزمن، پوسته‌ریزی {renderCheck(true)} بدون علامت
+                        {patient.systemExams?.['پوست، مو و ناخن']?.symptoms?.join('، ') || 'ثبت نشده'} {renderCheck(patient.systemExams?.['پوست، مو و ناخن'] ? patient.systemExams['پوست، مو و ناخن'].noSymptoms : undefined)} بدون علامت
                       </td>
                       <td className="border-l border-black p-1">
-                        ماکول، پاپول، ندول، وزیکول، زخم، کهیر، کلابینگ، آلوپسی {renderCheck(true)} بدون نشانه
+                        {patient.systemExams?.['پوست، مو و ناخن']?.signs?.join('، ') || 'ثبت نشده'} {renderCheck(patient.systemExams?.['پوست، مو و ناخن'] ? patient.systemExams['پوست، مو و ناخن'].noSigns : undefined)} بدون نشانه
                       </td>
                       <td className="p-1 text-slate-700">فاقد ضایعه درماتیت شغلی</td>
                     </tr>
@@ -417,10 +417,10 @@ export const OfficialFormPrint: React.FC<Props> = ({ patient, onBack }) => {
                     <tr className="border-b border-black">
                       <td className="border-l border-black p-1 font-bold text-center">گوش، حلق، بینی و دهان</td>
                       <td className="border-l border-black p-1">
-                        کاهش شنوایی، {renderCheck(true)} وزوز گوش، سرگیجه، درد، گرفتگی صدا، آبریزش بینی، مزه فلزی
+                        {patient.systemExams?.['گوش، حلق، بینی و دهان']?.symptoms?.join('، ') || 'ثبت نشده'} {renderCheck(patient.systemExams?.['گوش، حلق، بینی و دهان'] ? patient.systemExams['گوش، حلق، بینی و دهان'].noSymptoms : undefined)} بدون علامت
                       </td>
                       <td className="border-l border-black p-1">
-                        التهاب پرده تمپان، پارگی پرده، ترشح پشت حلق، Lead Line، التهاب لثه {renderCheck(true)} بدون نشانه
+                        {patient.systemExams?.['گوش، حلق، بینی و دهان']?.signs?.join('، ') || 'ثبت نشده'} {renderCheck(patient.systemExams?.['گوش، حلق، بینی و دهان'] ? patient.systemExams['گوش، حلق، بینی و دهان'].noSigns : undefined)} بدون نشانه
                       </td>
                       <td className="p-1 text-slate-700">پرده صماخ دو گوش سالم و بدون ترشح</td>
                     </tr>
@@ -429,10 +429,10 @@ export const OfficialFormPrint: React.FC<Props> = ({ patient, onBack }) => {
                     <tr>
                       <td className="border-l border-black p-1 font-bold text-center">سر و گردن</td>
                       <td className="border-l border-black p-1">
-                        درد گردن، توده گردنی {renderCheck(true)} بدون علامت
+                        {patient.systemExams?.['سر و گردن']?.symptoms?.join('، ') || 'ثبت نشده'} {renderCheck(patient.systemExams?.['سر و گردن'] ? patient.systemExams['سر و گردن'].noSymptoms : undefined)} بدون علامت
                       </td>
                       <td className="border-l border-black p-1">
-                        بزرگی تیروئید، لنفادنوپاتی گردنی {renderCheck(true)} بدون نشانه
+                        {patient.systemExams?.['سر و گردن']?.signs?.join('، ') || 'ثبت نشده'} {renderCheck(patient.systemExams?.['سر و گردن'] ? patient.systemExams['سر و گردن'].noSigns : undefined)} بدون نشانه
                       </td>
                       <td className="p-1 text-slate-700">تیروئید نرمال، فاقد آدنوپاتی</td>
                     </tr>
@@ -476,10 +476,10 @@ export const OfficialFormPrint: React.FC<Props> = ({ patient, onBack }) => {
                   <tr className="border-b border-black">
                     <td className="border-l border-black p-1 font-bold text-center">ریه</td>
                     <td className="border-l border-black p-1">
-                      سرفه، خلط، تنگی نفس کوششی، خس‌خس سینه {renderCheck(true)} بدون علامت
+                      {patient.systemExams?.['ریه']?.symptoms?.join('، ') || 'ثبت نشده'} {renderCheck(patient.systemExams?.['ریه'] ? patient.systemExams['ریه'].noSymptoms : undefined)} بدون علامت
                     </td>
                     <td className="border-l border-black p-1">
-                      وضعیت ظاهری قفسه سینه، خشونت صدا، ویزینگ، کراکل، تاکی‌پنه {renderCheck(true)} بدون نشانه
+                      {patient.systemExams?.['ریه']?.signs?.join('، ') || 'ثبت نشده'} {renderCheck(patient.systemExams?.['ریه'] ? patient.systemExams['ریه'].noSigns : undefined)} بدون نشانه
                     </td>
                     <td className="p-1 text-slate-700">سمع ریه دوطرفه پاک، فاقد رال و ویز</td>
                   </tr>
@@ -488,10 +488,10 @@ export const OfficialFormPrint: React.FC<Props> = ({ patient, onBack }) => {
                   <tr className="border-b border-black">
                     <td className="border-l border-black p-1 font-bold text-center">قلب و عروق</td>
                     <td className="border-l border-black p-1">
-                      درد قفسه سینه، تپش قلب، تنگی نفس شبانه، سیانوز، سنکوپ {renderCheck(true)} بدون علامت
+                      {patient.systemExams?.['قلب و عروق']?.symptoms?.join('، ') || 'ثبت نشده'} {renderCheck(patient.systemExams?.['قلب و عروق'] ? patient.systemExams['قلب و عروق'].noSymptoms : undefined)} بدون علامت
                     </td>
                     <td className="border-l border-black p-1">
-                      S1/S2 غیرطبیعی، صدای اضافی، آریتمی، واریس اندام‌ها، ادم {renderCheck(true)} بدون نشانه
+                      {patient.systemExams?.['قلب و عروق']?.signs?.join('، ') || 'ثبت نشده'} {renderCheck(patient.systemExams?.['قلب و عروق'] ? patient.systemExams['قلب و عروق'].noSigns : undefined)} بدون نشانه
                     </td>
                     <td className="p-1 text-slate-700">صداهای قلبی نرمال، فاقد سوفل یا آریتمی</td>
                   </tr>
@@ -500,10 +500,10 @@ export const OfficialFormPrint: React.FC<Props> = ({ patient, onBack }) => {
                   <tr className="border-b border-black">
                     <td className="border-l border-black p-1 font-bold text-center">شکم و لگن</td>
                     <td className="border-l border-black p-1">
-                      بی‌اشتهایی، تهوع، استفراغ، درد شکم، سوزش سر دل، اسهال، یبوست {renderCheck(true)} بدون علامت
+                      {patient.systemExams?.['شکم و لگن']?.symptoms?.join('، ') || 'ثبت نشده'} {renderCheck(patient.systemExams?.['شکم و لگن'] ? patient.systemExams['شکم و لگن'].noSymptoms : undefined)} بدون علامت
                     </td>
                     <td className="border-l border-black p-1">
-                      تندرنس شکمی، ریباند، هپاتومگالی، اسپلنومگالی، آسیت، توده {renderCheck(true)} بدون نشانه
+                      {patient.systemExams?.['شکم و لگن']?.signs?.join('، ') || 'ثبت نشده'} {renderCheck(patient.systemExams?.['شکم و لگن'] ? patient.systemExams['شکم و لگن'].noSigns : undefined)} بدون نشانه
                     </td>
                     <td className="p-1 text-slate-700">شکم نرم، فاقد تندرنس یا ارگانومگالی</td>
                   </tr>
@@ -512,10 +512,10 @@ export const OfficialFormPrint: React.FC<Props> = ({ patient, onBack }) => {
                   <tr className="border-b border-black">
                     <td className="border-l border-black p-1 font-bold text-center">کلیه و مجاری ادراری، تناسلی</td>
                     <td className="border-l border-black p-1">
-                      سوزش ادرار، تکرر، هماچوری، درد پهلو، توده بیضه {renderCheck(true)} بدون علامت
+                      {patient.systemExams?.['کلیه و مجاری ادراری']?.symptoms?.join('، ') || 'ثبت نشده'} {renderCheck(patient.systemExams?.['کلیه و مجاری ادراری'] ? patient.systemExams['کلیه و مجاری ادراری'].noSymptoms : undefined)} بدون علامت
                     </td>
                     <td className="border-l border-black p-1">
-                      تندرنس CVA، واریکوسل {renderCheck(true)} بدون نشانه
+                      {patient.systemExams?.['کلیه و مجاری ادراری']?.signs?.join('، ') || 'ثبت نشده'} {renderCheck(patient.systemExams?.['کلیه و مجاری ادراری'] ? patient.systemExams['کلیه و مجاری ادراری'].noSigns : undefined)} بدون نشانه
                     </td>
                     <td className="p-1 text-slate-700">CVA Tenderness دوطرفه منفی</td>
                   </tr>
@@ -524,10 +524,10 @@ export const OfficialFormPrint: React.FC<Props> = ({ patient, onBack }) => {
                   <tr className="border-b border-black">
                     <td className="border-l border-black p-1 font-bold text-center">اسکلتی و عضلانی</td>
                     <td className="border-l border-black p-1">
-                      خشکی مفصل، {renderCheck(true)} کمردرد، درد زانو، درد شانه، سایر مفاصل
+                      {patient.systemExams?.['اسکلتی و عضلانی']?.symptoms?.join('، ') || 'ثبت نشده'} {renderCheck(patient.systemExams?.['اسکلتی و عضلانی'] ? patient.systemExams['اسکلتی و عضلانی'].noSymptoms : undefined)} بدون علامت
                     </td>
                     <td className="border-l border-black p-1">
-                      محدودیت حرکتی مفصل، ضعف عضلانی، اسکولیوز، آمپوتاسیون، تست SLR مثبت {renderCheck(true)} بدون نشانه
+                      {patient.systemExams?.['اسکلتی و عضلانی']?.signs?.join('، ') || 'ثبت نشده'} {renderCheck(patient.systemExams?.['اسکلتی و عضلانی'] ? patient.systemExams['اسکلتی و عضلانی'].noSigns : undefined)} بدون نشانه
                     </td>
                     <td className="p-1 text-slate-700">کمردرد وضعیتی، دامنه‌های حرکتی کامل</td>
                   </tr>
@@ -536,10 +536,10 @@ export const OfficialFormPrint: React.FC<Props> = ({ patient, onBack }) => {
                   <tr className="border-b border-black">
                     <td className="border-l border-black p-1 font-bold text-center">سیستم عصبی</td>
                     <td className="border-l border-black p-1">
-                      سردرد، گیجی، لرزش، اختلال حافظه، صرع، گزگز انگشتان {renderCheck(true)} بدون علامت
+                      {patient.systemExams?.['سیستم عصبی']?.symptoms?.join('، ') || 'ثبت نشده'} {renderCheck(patient.systemExams?.['سیستم عصبی'] ? patient.systemExams['سیستم عصبی'].noSymptoms : undefined)} بدون علامت
                     </td>
                     <td className="border-l border-black p-1">
-                      رفلکس غیرطبیعی زانو/آشیل، رومبرگ مختل، ترمور، تینل مثبت، فالن مثبت {renderCheck(true)} بدون نشانه
+                      {patient.systemExams?.['سیستم عصبی']?.signs?.join('، ') || 'ثبت نشده'} {renderCheck(patient.systemExams?.['سیستم عصبی'] ? patient.systemExams['سیستم عصبی'].noSigns : undefined)} بدون نشانه
                     </td>
                     <td className="p-1 text-slate-700">DTR نرمال، تعادل و هماهنگی عصبی برقرار</td>
                   </tr>
@@ -548,10 +548,10 @@ export const OfficialFormPrint: React.FC<Props> = ({ patient, onBack }) => {
                   <tr>
                     <td className="border-l border-black p-1 font-bold text-center">اعصاب و روان</td>
                     <td className="border-l border-black p-1">
-                      عصبانیت بیش از حد، پرخاشگری، اضطراب، خلق پایین، کاهش انگیزه {renderCheck(true)} بدون علامت
+                      {patient.systemExams?.['اعصاب و روان']?.symptoms?.join('، ') || 'ثبت نشده'} {renderCheck(patient.systemExams?.['اعصاب و روان'] ? patient.systemExams['اعصاب و روان'].noSymptoms : undefined)} بدون علامت
                     </td>
                     <td className="border-l border-black p-1">
-                      هذیان، توهم، اختلال جهت‌یابی و هوشیاری {renderCheck(true)} بدون نشانه
+                      {patient.systemExams?.['اعصاب و روان']?.signs?.join('، ') || 'ثبت نشده'} {renderCheck(patient.systemExams?.['اعصاب و روان'] ? patient.systemExams['اعصاب و روان'].noSigns : undefined)} بدون نشانه
                     </td>
                     <td className="p-1 text-slate-700">خلق و عاطفه مناسب، هوشیار و جهت‌یاب</td>
                   </tr>
@@ -562,12 +562,12 @@ export const OfficialFormPrint: React.FC<Props> = ({ patient, onBack }) => {
                 <div>
                   <strong>سایر موارد و یافته‌های بالینی:</strong>
                   <p className="mt-1 text-slate-700">
-                    شاغل از نظر وضعیت عمومی و قلبی-تنفسی در وضعیت مناسبی قرار دارد. افت شنوایی ناشی از صوت نیازمند پایش مستمر است.
+                    {patient.systemExams?.['سایر']?.notes || 'ثبت نشده'}
                   </p>
                 </div>
 
                 <div className="flex justify-between items-center pt-6 text-[10px] border-t border-dotted border-slate-400 mt-4">
-                  <div><strong>مشخصات پزشک معاینه‌کننده:</strong> دکتر محمدرضا صادقی (کد نظام پزشکی: ۵۴۲۱۸)</div>
+                  <div><strong>مشخصات پزشک معاینه‌کننده:</strong> {patient.doctorDecision?.doctorName || 'ثبت نشده'} (کد نظام پزشکی: {patient.doctorDecision?.medicalCode || 'ثبت نشده'})</div>
                   <div><strong>تاریخ معاینه:</strong> {patient.examinationDate}</div>
                   <div className="border border-dashed border-black px-6 py-2">
                     <strong>مهر و امضاء پزشک معاینه‌کننده</strong>
@@ -709,7 +709,7 @@ export const OfficialFormPrint: React.FC<Props> = ({ patient, onBack }) => {
 
               {/* ب- اودیومتری */}
               <div className="p-2 border-b border-black">
-                <div className="font-bold text-xs mb-1">ب- اودیومتری (شنوایی‌سنجی): تاریخ: {patient.paraclinic.audiometry.date || patient.examinationDate}</div>
+                <div className="font-bold text-xs mb-1">ب- اودیومتری (شنوایی‌سنجی): تاریخ: {patient.paraclinic.audiometry.date || 'ثبت نشده'}</div>
                 <table className="w-full border-collapse text-center text-[9.5px]">
                   <thead>
                     <tr className="bg-slate-100 border border-black">
@@ -739,7 +739,7 @@ export const OfficialFormPrint: React.FC<Props> = ({ patient, onBack }) => {
                       <td className="border-l border-black p-1">{patient.paraclinic.audiometry.srtRight}</td>
                       <td className="border-l border-black p-1">{patient.paraclinic.audiometry.sdsRight}</td>
                       <td className="p-1 text-right pr-1" rowSpan={2}>
-                        {patient.paraclinic.audiometry.interpretationRight || 'طبیعی'}
+                        {patient.paraclinic.audiometry.interpretationRight || 'ثبت نشده'}
                       </td>
                     </tr>
                     <tr className="border-b border-black">
@@ -766,7 +766,7 @@ export const OfficialFormPrint: React.FC<Props> = ({ patient, onBack }) => {
                       <td className="border-l border-black p-1">{patient.paraclinic.audiometry.srtLeft}</td>
                       <td className="border-l border-black p-1">{patient.paraclinic.audiometry.sdsLeft}</td>
                       <td className="p-1 text-right pr-1" rowSpan={2}>
-                        {patient.paraclinic.audiometry.interpretationLeft || 'طبیعی'}
+                        {patient.paraclinic.audiometry.interpretationLeft || 'ثبت نشده'}
                       </td>
                     </tr>
                     <tr>
@@ -787,7 +787,7 @@ export const OfficialFormPrint: React.FC<Props> = ({ patient, onBack }) => {
 
               {/* ج- اسپیرومتری */}
               <div className="p-2">
-                <div className="font-bold text-xs mb-1">ج- اسپیرومتری (آزمون عملکرد ریه): تاریخ: {patient.paraclinic.spirometry.date || patient.examinationDate}</div>
+                <div className="font-bold text-xs mb-1">ج- اسپیرومتری (آزمون عملکرد ریه): تاریخ: {patient.paraclinic.spirometry.date || 'ثبت نشده'}</div>
                 <table className="w-full border-collapse text-center text-[10px]">
                   <thead>
                     <tr className="bg-slate-100 border border-black">
@@ -801,17 +801,17 @@ export const OfficialFormPrint: React.FC<Props> = ({ patient, onBack }) => {
                   </thead>
                   <tbody>
                     <tr className="border border-black font-semibold">
-                      <td className="border-l border-black p-1">{patient.paraclinic.spirometry.fev1 || '3.65 L (94%)'}</td>
-                      <td className="border-l border-black p-1">{patient.paraclinic.spirometry.fvc || '4.52 L (96%)'}</td>
-                      <td className="border-l border-black p-1">{patient.paraclinic.spirometry.fev1FvcRatio || '80.7%'}</td>
-                      <td className="border-l border-black p-1">{patient.paraclinic.spirometry.fef2575 || '3.8 L/s'}</td>
-                      <td className="border-l border-black p-1">{patient.paraclinic.spirometry.pef || '580 L/min'}</td>
-                      <td className="p-1">{patient.paraclinic.spirometry.vext || '0.08 L'}</td>
+                      <td className="border-l border-black p-1">{patient.paraclinic.spirometry.fev1 || 'ثبت نشده'}</td>
+                      <td className="border-l border-black p-1">{patient.paraclinic.spirometry.fvc || 'ثبت نشده'}</td>
+                      <td className="border-l border-black p-1">{patient.paraclinic.spirometry.fev1FvcRatio || 'ثبت نشده'}</td>
+                      <td className="border-l border-black p-1">{patient.paraclinic.spirometry.fef2575 || 'ثبت نشده'}</td>
+                      <td className="border-l border-black p-1">{patient.paraclinic.spirometry.pef || 'ثبت نشده'}</td>
+                      <td className="p-1">{patient.paraclinic.spirometry.vext || 'ثبت نشده'}</td>
                     </tr>
                   </tbody>
                 </table>
                 <div className="mt-1 text-[10px]">
-                  <strong>تفسیر اسپیرومتری:</strong> {patient.paraclinic.spirometry.interpretation || 'الگوی اسپیرومتری نرمال بدون انسداد یا تحدید ریوی.'}
+                  <strong>تفسیر اسپیرومتری:</strong> {patient.paraclinic.spirometry.interpretation || 'ثبت نشده'}
                 </div>
               </div>
             </div>
@@ -851,7 +851,7 @@ export const OfficialFormPrint: React.FC<Props> = ({ patient, onBack }) => {
                 <div>
                   <strong>نتیجه رادیوگرافی، سونوگرافی، سی‌تی اسکن و سایر موارد:</strong>
                   <p className="mt-1 text-slate-700 pr-2">
-                    {patient.paraclinic.other.ultrasoundFindings || 'مورد تصویربرداری تکمیلی ضرورت نیافت.'}
+                    {patient.paraclinic.other.ultrasoundFindings || 'ثبت نشده'}
                   </p>
                 </div>
               </div>
@@ -878,13 +878,13 @@ export const OfficialFormPrint: React.FC<Props> = ({ patient, onBack }) => {
                         <div><strong>علت ارجاع:</strong> {ref.reason}</div>
                       </td>
                       <td className="p-2 align-top text-slate-800">
-                        {ref.result || 'در انتظار دریافت پاسخ مشاور...'}
+                        {ref.result || 'ثبت نشده'}
                       </td>
                     </tr>
                   ))}
                   {patient.referrals.length === 0 && (
                     <tr className="border-b border-black">
-                      <td className="border-l border-black p-2 text-slate-500 italic">نیاز به ارجاع تخصصی نداشت.</td>
+                      <td className="border-l border-black p-2 text-slate-500 italic">ارجاع ثبت نشده</td>
                       <td className="p-2 text-slate-500 italic">—</td>
                     </tr>
                   )}
@@ -936,30 +936,30 @@ export const OfficialFormPrint: React.FC<Props> = ({ patient, onBack }) => {
               <div className="border-t border-black pt-2">
                 <strong className="text-xs">توصیه‌های پزشکی لازم:</strong>
                 <p className="mt-1 text-slate-800 text-[11px] leading-relaxed bg-white p-2 border border-slate-300 rounded">
-                  {patient.doctorDecision?.recommendations || 'رعایت اصول بهداشت فردی و ارگونومی کار.'}
+                  {patient.doctorDecision?.recommendations || 'ثبت نشده'}
                 </p>
               </div>
 
               <div className="border-t-2 border-black pt-4 mt-3 flex justify-between items-center text-[10.5px]">
                 <div>
                   <strong>مشخصات پزشک متخصص طب کار / ارائه‌دهنده نظر نهایی:</strong>
-                  <div className="mt-1 font-bold text-slate-900">{patient.doctorDecision?.doctorName || 'دکتر محمدرضا صادقی'}</div>
+                  <div className="mt-1 font-bold text-slate-900">{patient.doctorDecision?.doctorName || 'ثبت نشده'}</div>
                 </div>
 
                 <div>
                   <strong>کد معاینات سلامت شغلی:</strong>
-                  <div className="mt-1 font-bold">{patient.doctorDecision?.medicalCode || 'م-۵۴۲۱۸'}</div>
+                  <div className="mt-1 font-bold">{patient.doctorDecision?.medicalCode || 'ثبت نشده'}</div>
                 </div>
 
                 <div>
-                  <strong>تاریخ:</strong> {patient.doctorDecision?.date || patient.examinationDate}
+                  <strong>تاریخ:</strong> {patient.doctorDecision?.date || 'ثبت نشده'}
                 </div>
 
                 <div className="border-2 border-black p-2 text-center bg-white min-w-[120px]">
                   <div className="font-bold text-[10px]">مهر و امضاء پزشک طب کار</div>
                   <div className="text-[9px] text-emerald-700 mt-1 flex items-center justify-center gap-1">
                     <ShieldCheck className="w-3.5 h-3.5" />
-                    <span>تایید الکترونیک سامانه</span>
+                    <span>امضای دیجیتال معتبر ثبت نشده است</span>
                   </div>
                 </div>
               </div>

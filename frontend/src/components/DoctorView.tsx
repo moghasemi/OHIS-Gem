@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Patient } from '../types/index.ts';
-import { canTransitionWorkflow, DoctorDecision } from '../domain/rules.ts';
+import { DoctorDecision } from '../domain/rules.ts';
 import {
   Stethoscope,
   Lock,
@@ -23,19 +23,17 @@ interface Props {
   onOpenOfficialForm: (patient: Patient) => void;
 }
 
-export const DoctorView: React.FC<Props> = ({ patient, onUpdatePatient, onOpenOfficialForm }) => {
+export const DoctorView: React.FC<Props> = ({ patient, onOpenOfficialForm }) => {
   const [activeStep, setActiveStep] = useState(1);
   const [decision, setDecision] = useState<DoctorDecision>(
-    patient.doctorDecision?.opinion || 'mashroot'
+    patient.doctorDecision?.opinion || ''
   );
   const [conditions, setConditions] = useState(
-    patient.doctorDecision?.conditions ||
-      'استفاده مستمر از تجهیزات حفاظت شنوایی (ایرماف NRR>25) حین کار در سالن پرس. رعایت محدودیت حمل دستی بار تا ۲۵ کیلوگرم.'
+    patient.doctorDecision?.conditions || ''
   );
   const [unfitReasons, setUnfitReasons] = useState(patient.doctorDecision?.unfitReasons || '');
   const [recommendations, setRecommendations] = useState(
-    patient.doctorDecision?.recommendations ||
-      'پایش ادیومتری دوره‌ای هر ۶ ماه، آموزش ارگونومی ستون فقرات و تمرینات کششی روزانه.'
+    patient.doctorDecision?.recommendations || ''
   );
 
   // Referrals
@@ -94,37 +92,9 @@ export const DoctorView: React.FC<Props> = ({ patient, onUpdatePatient, onOpenOf
   };
 
   const handleFinalizeAndLock = () => {
-    const hasUnresolved = referrals.some((r) => r.status === 'PENDING');
-    const transitionCheck = canTransitionWorkflow(patient.status, 'COMPLETED_LOCKED', {
-      doctorOpinion: decision,
-      hasUnresolvedReferrals: hasUnresolved,
-      isLocked: patient.isLocked,
-    });
-
-    if (!transitionCheck.allowed) {
-      alert(`⚠️ خطای بالینی: ${transitionCheck.reason}`);
-      return;
-    }
-
-    const updated: Patient = {
-      ...patient,
-      referrals,
-      doctorDecision: {
-        opinion: decision,
-        conditions,
-        unfitReasons,
-        recommendations,
-        doctorName: 'دکتر محمدرضا صادقی',
-        medicalCode: 'م-۵۴۲۱۸',
-        date: '۱۴۰۵/۰۴/۰۲',
-        signed: true,
-      },
-      status: 'COMPLETED_LOCKED',
-      isLocked: true,
-    };
-
-    onUpdatePatient(updated);
-    setLockFeedback('پرونده با امضای الکترونیک تایید و قفل گردید. امکان تغییر مستقیم مسدود شد.');
+    const message = 'قفل پرونده غیرفعال است؛ ابتدا باید هویت پزشک از حساب معتبر سرور تأیید و امضای دیجیتال قابل راستی‌آزمایی پیاده‌سازی شود.';
+    setLockFeedback(message);
+    alert(message);
   };
 
   const SYSTEMS = [

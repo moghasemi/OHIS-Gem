@@ -23,22 +23,22 @@ interface Props {
 
 export const ReceptionView: React.FC<Props> = ({ patients, onAddPatient, onSelectPatient }) => {
   const [currentStep, setCurrentStep] = useState(1);
-  const [nationalId, setNationalId] = useState('0029871234');
-  const [firstName, setFirstName] = useState('علیرضا');
-  const [lastName, setLastName] = useState('مرادی');
-  const [fatherName, setFatherName] = useState('محمد');
-  const [birthYear, setBirthYear] = useState('۱۳۷۴');
+  const [nationalId, setNationalId] = useState('');
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
+  const [fatherName, setFatherName] = useState('');
+  const [birthYear, setBirthYear] = useState('');
   const [gender, setGender] = useState<'مرد' | 'زن'>('مرد');
   const [maritalStatus, setMaritalStatus] = useState<'متاهل' | 'مجرد'>('متاهل');
   const [childrenCount, setChildrenCount] = useState(1);
   const [militaryStatus, setMilitaryStatus] = useState<'خدمت کرده' | 'معافیت پزشکی' | 'غیرمشمول'>('خدمت کرده');
-  const [militaryBranch, setMilitaryBranch] = useState('پدافند هوایی');
-  const [mobile, setMobile] = useState('09121112233');
-  const [workAddress, setWorkAddress] = useState('تهران، جاده مخصوص، صنایع خودرو');
-  const [homeAddress, setHomeAddress] = useState('تهران، میدان ونک، خیابان گاندی، کوچه هشتم');
-  const [companyName, setCompanyName] = useState('صنایع فلزی البرز');
-  const [jobTitle, setJobTitle] = useState('مونتاژکار قطعات صنعتی');
-  const [duty, setDuty] = useState('مونتاژ مکانیکی و سنگ‌زنی قطعات');
+  const [militaryBranch, setMilitaryBranch] = useState('');
+  const [mobile, setMobile] = useState('');
+  const [workAddress, setWorkAddress] = useState('');
+  const [homeAddress, setHomeAddress] = useState('');
+  const [companyName, setCompanyName] = useState('');
+  const [jobTitle, setJobTitle] = useState('');
+  const [duty, setDuty] = useState('');
   const [examinationType, setExaminationType] = useState<'بدواستخدام' | 'دوره‌ای' | 'موردی'>('دوره‌ای');
 
   // Package & Payment
@@ -49,22 +49,7 @@ export const ReceptionView: React.FC<Props> = ({ patients, onAddPatient, onSelec
 
   // 16 Medical Questions
   const [medicalAnswers, setMedicalAnswers] = useState<Record<number, { answer: 'بلی' | 'خیر'; details: string }>>({
-    1: { answer: 'خیر', details: '' },
-    2: { answer: 'خیر', details: '' },
-    3: { answer: 'خیر', details: '' },
-    4: { answer: 'خیر', details: '' },
-    5: { answer: 'خیر', details: '' },
-    6: { answer: 'خیر', details: '' },
-    7: { answer: 'خیر', details: '' },
-    8: { answer: 'خیر', details: '' },
-    9: { answer: 'خیر', details: '' },
-    10: { answer: 'خیر', details: '' },
-    11: { answer: 'خیر', details: '' },
-    12: { answer: 'بلی', details: 'ورزش فوتسال هفتگی' },
-    13: { answer: 'خیر', details: '' },
-    14: { answer: 'خیر', details: '' },
-    15: { answer: 'خیر', details: '' },
-    16: { answer: 'خیر', details: '' },
+
   });
 
   // SMS Verification
