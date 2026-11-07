@@ -17,7 +17,7 @@ export const INITIAL_PATIENTS: Patient[] = [{
     biochemistry: { fbs: '', chol: '', ldl: '', hdl: '', tg: '', bun: '', cr: '', alt: '', ast: '', alkPh: '', psa: '', hbsAg: '', seOb: '', ppd: '' },
     specialTests: [] },
   paraclinic: {
-    optometry: { date: '', vaRightNoCorr: '', vaLeftNoCorr: '', vaRightWithCorr: '', vaLeftWithCorr: '', colorVisionRight: 'غیرطبیعی', colorVisionLeft: 'غیرطبیعی', visualFieldRight: '', visualFieldLeft: '', depthArcSeconds: '' },
+    optometry: { date: '', vaRightNoCorr: '', vaLeftNoCorr: '', vaRightWithCorr: '', vaLeftWithCorr: '', colorVisionRight: '', colorVisionLeft: '', visualFieldRight: '', visualFieldLeft: '', depthArcSeconds: '' },
     audiometry: { date: '', rightAC: {}, rightBC: {}, leftAC: {}, leftBC: {}, srtRight: 0, sdsRight: '', srtLeft: 0, sdsLeft: '', interpretationRight: '', interpretationLeft: '' },
     spirometry: { date: '', fev1: '', fvc: '', fev1FvcRatio: '', fef2575: '', pef: '', vext: '', interpretation: '' },
     other: { cxrFindings: '', cxrDate: '', ecgFindings: '', ecgDate: '', ultrasoundFindings: '', otherRadiology: '' },
