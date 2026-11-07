@@ -1,11 +1,21 @@
 from rest_framework import viewsets, status
+from rest_framework.permissions import BasePermission
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from django.core.cache import cache
 from .models import PatientDossier, Referral
 from .serializers import PatientDossierSerializer, ReferralSerializer
 
+class ClinicalApiDisabled(BasePermission):
+    """Fail closed until tenant isolation and role authorization are implemented."""
+    message = "Clinical API is disabled until tenant isolation and role authorization exist."
+
+    def has_permission(self, request, view):
+        return False
+
+
 class PatientDossierViewSet(viewsets.ModelViewSet):
+    permission_classes = [ClinicalApiDisabled]
     queryset = PatientDossier.objects.all()
     serializer_class = PatientDossierSerializer
 
@@ -40,5 +50,6 @@ class PatientDossierViewSet(viewsets.ModelViewSet):
             return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 class ReferralViewSet(viewsets.ModelViewSet):
+    permission_classes = [ClinicalApiDisabled]
     queryset = Referral.objects.all()
     serializer_class = ReferralSerializer

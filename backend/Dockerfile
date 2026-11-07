@@ -1,4 +1,4 @@
-FROM python:3.12-slim
+FROM python:3.11-slim
 
 ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
@@ -11,8 +11,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     curl \
     && rm -rf /var/lib/apt/lists/*
 
-COPY requirements/base.txt /app/requirements/
-RUN pip install --no-cache-dir -r requirements/base.txt
+COPY requirements/base.txt requirements/production.txt requirements/constraints.txt /app/requirements/
+RUN pip install --no-cache-dir -r requirements/production.txt -c requirements/constraints.txt && pip check
 
 COPY . /app/
 

@@ -1,9 +1,37 @@
+# Python bytecode & virtual environments
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+.venv/
+*.egg-info/
+.eggs/
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Node & Frontend
 node_modules/
 build/
 dist/
 coverage/
-.DS_Store
-*.log
+
+# Environment & Secrets (Security by Design)
 .env*
 !.env.example
+deployment/ci.env
+
+# System & IDE
+.DS_Store
+*.log
+.vscode/
+.idea/
 .playwright-cli/
+
+# Runtime data and generated assets
+/backend/media/
+/backend/staticfiles/
+*.sqlite3
