@@ -25,7 +25,7 @@ interface Props {
 
 export const DoctorView: React.FC<Props> = ({ patient, onOpenOfficialForm }) => {
   const [activeStep, setActiveStep] = useState(1);
-  const [decision, setDecision] = useState<DoctorDecision>(
+  const [decision, setDecision] = useState<DoctorDecision | ''>(
     patient.doctorDecision?.opinion || ''
   );
   const [conditions, setConditions] = useState(
