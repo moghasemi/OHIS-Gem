@@ -205,20 +205,20 @@ export const OfficialFormPrint: React.FC<Props> = ({ patient, onBack }) => {
                   <tr className="border-b border-black align-top">
                     <td className="border-l border-black p-1 font-bold text-center">مشاغل فعلی</td>
                     <td className="border-l border-black p-1 space-y-0.5">
-                      <div>{renderCheck(patient.hseHazards.physical.includes('سر و صدا'))} سر و صدا</div>
-                      <div>{renderCheck(patient.hseHazards.physical.includes('ارتعاش'))} ارتعاش</div>
-                      <div>{renderCheck(patient.hseHazards.physical.includes('اشعه غیر یونیزان'))} اشعه غیر یونیزان</div>
-                      <div>{renderCheck(patient.hseHazards.physical.includes('اشعه یونیزان'))} اشعه یونیزان</div>
-                      <div>{renderCheck(patient.hseHazards.physical.includes('استرس حرارتی'))} استرس حرارتی</div>
+                      <div>{renderCheck(patient.hseHazards.physical.includes('سر و صدا') ? true : undefined)} سر و صدا</div>
+                      <div>{renderCheck(patient.hseHazards.physical.includes('ارتعاش') ? true : undefined)} ارتعاش</div>
+                      <div>{renderCheck(patient.hseHazards.physical.includes('اشعه غیر یونیزان') ? true : undefined)} اشعه غیر یونیزان</div>
+                      <div>{renderCheck(patient.hseHazards.physical.includes('اشعه یونیزان') ? true : undefined)} اشعه یونیزان</div>
+                      <div>{renderCheck(patient.hseHazards.physical.includes('استرس حرارتی') ? true : undefined)} استرس حرارتی</div>
                       <div>{renderCheck(undefined)} سایر</div>
                     </td>
                     <td className="border-l border-black p-1 space-y-0.5">
-                      <div>{renderCheck(patient.hseHazards.chemical.includes('گردوغبار'))} گردوغبار</div>
-                      <div>{renderCheck(patient.hseHazards.chemical.includes('دمه فلزات'))} دمه فلزات</div>
-                      <div>{renderCheck(patient.hseHazards.chemical.includes('حلال‌ها'))} حلال</div>
-                      <div>{renderCheck(patient.hseHazards.chemical.includes('آفت‌کش‌ها'))} آفت‌کش‌ها</div>
-                      <div>{renderCheck(patient.hseHazards.chemical.includes('اسید و بازها'))} اسید و بازها</div>
-                      <div>{renderCheck(patient.hseHazards.chemical.includes('گازها'))} گازها</div>
+                      <div>{renderCheck(patient.hseHazards.chemical.includes('گردوغبار') ? true : undefined)} گردوغبار</div>
+                      <div>{renderCheck(patient.hseHazards.chemical.includes('دمه فلزات') ? true : undefined)} دمه فلزات</div>
+                      <div>{renderCheck(patient.hseHazards.chemical.includes('حلال‌ها') ? true : undefined)} حلال</div>
+                      <div>{renderCheck(patient.hseHazards.chemical.includes('آفت‌کش‌ها') ? true : undefined)} آفت‌کش‌ها</div>
+                      <div>{renderCheck(patient.hseHazards.chemical.includes('اسید و بازها') ? true : undefined)} اسید و بازها</div>
+                      <div>{renderCheck(patient.hseHazards.chemical.includes('گازها') ? true : undefined)} گازها</div>
                     </td>
                     <td className="border-l border-black p-1 space-y-0.5">
                       <div>{renderCheck(undefined)} گزش</div>
@@ -228,15 +228,15 @@ export const OfficialFormPrint: React.FC<Props> = ({ patient, onBack }) => {
                       <div>{renderCheck(undefined)} سایر</div>
                     </td>
                     <td className="border-l border-black p-1 space-y-0.5">
-                      <div>{renderCheck(patient.hseHazards.ergonomic.includes('ایستادن طولانی مدت'))} ایستادن یا نشستن طولانی</div>
-                      <div>{renderCheck(patient.hseHazards.ergonomic.includes('کار تکراری'))} کار تکراری</div>
-                      <div>{renderCheck(patient.hseHazards.ergonomic.includes('حمل و نقل بار سنگین'))} حمل و نقل بار سنگین</div>
-                      <div>{renderCheck(patient.hseHazards.ergonomic.includes('وضعیت نامناسب بدن'))} وضعیت نامناسب بدن</div>
+                      <div>{renderCheck(patient.hseHazards.ergonomic.includes('ایستادن طولانی مدت') ? true : undefined)} ایستادن یا نشستن طولانی</div>
+                      <div>{renderCheck(patient.hseHazards.ergonomic.includes('کار تکراری') ? true : undefined)} کار تکراری</div>
+                      <div>{renderCheck(patient.hseHazards.ergonomic.includes('حمل و نقل بار سنگین') ? true : undefined)} حمل و نقل بار سنگین</div>
+                      <div>{renderCheck(patient.hseHazards.ergonomic.includes('وضعیت نامناسب بدن') ? true : undefined)} وضعیت نامناسب بدن</div>
                       <div>{renderCheck(undefined)} سایر</div>
                     </td>
                     <td className="p-1 space-y-0.5">
-                      <div>{renderCheck(patient.hseHazards.psychological.includes('نوبت‌کاری'))} نوبت‌کاری</div>
-                      <div>{renderCheck(patient.hseHazards.psychological.includes('استرسورهای شغلی'))} استرسورهای شغلی</div>
+                      <div>{renderCheck(patient.hseHazards.psychological.includes('نوبت‌کاری') ? true : undefined)} نوبت‌کاری</div>
+                      <div>{renderCheck(patient.hseHazards.psychological.includes('استرسورهای شغلی') ? true : undefined)} استرسورهای شغلی</div>
                       <div>{renderCheck(undefined)} سایر</div>
                     </td>
                   </tr>
@@ -386,7 +386,7 @@ export const OfficialFormPrint: React.FC<Props> = ({ patient, onBack }) => {
                       <td className="border-l border-black p-1">
                         {patient.systemExams?.['عمومی']?.signs?.join('، ') || 'ثبت نشده'} {renderCheck(patient.systemExams?.['عمومی'] ? patient.systemExams['عمومی'].noSigns : undefined)} بدون نشانه
                       </td>
-                      <td className="p-1 text-slate-700">وضعیت عمومی نرمال</td>
+                      <td className="p-1 text-slate-700">{patient.systemExams?.['عمومی']?.notes || 'ثبت نشده'}</td>
                     </tr>
 
                     {/* چشم */}
@@ -398,7 +398,7 @@ export const OfficialFormPrint: React.FC<Props> = ({ patient, onBack }) => {
                       <td className="border-l border-black p-1">
                         {patient.systemExams?.['چشم']?.signs?.join('، ') || 'ثبت نشده'} {renderCheck(patient.systemExams?.['چشم'] ? patient.systemExams['چشم'].noSigns : undefined)} بدون نشانه
                       </td>
-                      <td className="p-1 text-slate-700">مردمک‌ها قرینه و با واکنش طبیعی به نور</td>
+                      <td className="p-1 text-slate-700">{patient.systemExams?.['چشم']?.notes || 'ثبت نشده'}</td>
                     </tr>
 
                     {/* پوست و مو و ناخن */}
@@ -410,7 +410,7 @@ export const OfficialFormPrint: React.FC<Props> = ({ patient, onBack }) => {
                       <td className="border-l border-black p-1">
                         {patient.systemExams?.['پوست، مو و ناخن']?.signs?.join('، ') || 'ثبت نشده'} {renderCheck(patient.systemExams?.['پوست، مو و ناخن'] ? patient.systemExams['پوست، مو و ناخن'].noSigns : undefined)} بدون نشانه
                       </td>
-                      <td className="p-1 text-slate-700">فاقد ضایعه درماتیت شغلی</td>
+                      <td className="p-1 text-slate-700">{patient.systemExams?.['پوست، مو و ناخن']?.notes || 'ثبت نشده'}</td>
                     </tr>
 
                     {/* گوش، حلق، بینی و دهان */}
@@ -422,7 +422,7 @@ export const OfficialFormPrint: React.FC<Props> = ({ patient, onBack }) => {
                       <td className="border-l border-black p-1">
                         {patient.systemExams?.['گوش، حلق، بینی و دهان']?.signs?.join('، ') || 'ثبت نشده'} {renderCheck(patient.systemExams?.['گوش، حلق، بینی و دهان'] ? patient.systemExams['گوش، حلق، بینی و دهان'].noSigns : undefined)} بدون نشانه
                       </td>
-                      <td className="p-1 text-slate-700">پرده صماخ دو گوش سالم و بدون ترشح</td>
+                      <td className="p-1 text-slate-700">{patient.systemExams?.['گوش، حلق، بینی و دهان']?.notes || 'ثبت نشده'}</td>
                     </tr>
 
                     {/* سر و گردن */}
@@ -434,7 +434,7 @@ export const OfficialFormPrint: React.FC<Props> = ({ patient, onBack }) => {
                       <td className="border-l border-black p-1">
                         {patient.systemExams?.['سر و گردن']?.signs?.join('، ') || 'ثبت نشده'} {renderCheck(patient.systemExams?.['سر و گردن'] ? patient.systemExams['سر و گردن'].noSigns : undefined)} بدون نشانه
                       </td>
-                      <td className="p-1 text-slate-700">تیروئید نرمال، فاقد آدنوپاتی</td>
+                      <td className="p-1 text-slate-700">{patient.systemExams?.['سر و گردن']?.notes || 'ثبت نشده'}</td>
                     </tr>
                   </tbody>
                 </table>
@@ -481,7 +481,7 @@ export const OfficialFormPrint: React.FC<Props> = ({ patient, onBack }) => {
                     <td className="border-l border-black p-1">
                       {patient.systemExams?.['ریه']?.signs?.join('، ') || 'ثبت نشده'} {renderCheck(patient.systemExams?.['ریه'] ? patient.systemExams['ریه'].noSigns : undefined)} بدون نشانه
                     </td>
-                    <td className="p-1 text-slate-700">سمع ریه دوطرفه پاک، فاقد رال و ویز</td>
+                    <td className="p-1 text-slate-700">{patient.systemExams?.['ریه']?.notes || 'ثبت نشده'}</td>
                   </tr>
 
                   {/* قلب و عروق */}
@@ -493,7 +493,7 @@ export const OfficialFormPrint: React.FC<Props> = ({ patient, onBack }) => {
                     <td className="border-l border-black p-1">
                       {patient.systemExams?.['قلب و عروق']?.signs?.join('، ') || 'ثبت نشده'} {renderCheck(patient.systemExams?.['قلب و عروق'] ? patient.systemExams['قلب و عروق'].noSigns : undefined)} بدون نشانه
                     </td>
-                    <td className="p-1 text-slate-700">صداهای قلبی نرمال، فاقد سوفل یا آریتمی</td>
+                    <td className="p-1 text-slate-700">{patient.systemExams?.['قلب و عروق']?.notes || 'ثبت نشده'}</td>
                   </tr>
 
                   {/* شکم و لگن */}
@@ -505,7 +505,7 @@ export const OfficialFormPrint: React.FC<Props> = ({ patient, onBack }) => {
                     <td className="border-l border-black p-1">
                       {patient.systemExams?.['شکم و لگن']?.signs?.join('، ') || 'ثبت نشده'} {renderCheck(patient.systemExams?.['شکم و لگن'] ? patient.systemExams['شکم و لگن'].noSigns : undefined)} بدون نشانه
                     </td>
-                    <td className="p-1 text-slate-700">شکم نرم، فاقد تندرنس یا ارگانومگالی</td>
+                    <td className="p-1 text-slate-700">{patient.systemExams?.['شکم و لگن']?.notes || 'ثبت نشده'}</td>
                   </tr>
 
                   {/* کلیه و مجاری ادراری */}
@@ -517,7 +517,7 @@ export const OfficialFormPrint: React.FC<Props> = ({ patient, onBack }) => {
                     <td className="border-l border-black p-1">
                       {patient.systemExams?.['کلیه و مجاری ادراری']?.signs?.join('، ') || 'ثبت نشده'} {renderCheck(patient.systemExams?.['کلیه و مجاری ادراری'] ? patient.systemExams['کلیه و مجاری ادراری'].noSigns : undefined)} بدون نشانه
                     </td>
-                    <td className="p-1 text-slate-700">CVA Tenderness دوطرفه منفی</td>
+                    <td className="p-1 text-slate-700">{patient.systemExams?.['کلیه و مجاری ادراری']?.notes || 'ثبت نشده'}</td>
                   </tr>
 
                   {/* اسکلتی و عضلانی */}
@@ -529,7 +529,7 @@ export const OfficialFormPrint: React.FC<Props> = ({ patient, onBack }) => {
                     <td className="border-l border-black p-1">
                       {patient.systemExams?.['اسکلتی و عضلانی']?.signs?.join('، ') || 'ثبت نشده'} {renderCheck(patient.systemExams?.['اسکلتی و عضلانی'] ? patient.systemExams['اسکلتی و عضلانی'].noSigns : undefined)} بدون نشانه
                     </td>
-                    <td className="p-1 text-slate-700">کمردرد وضعیتی، دامنه‌های حرکتی کامل</td>
+                    <td className="p-1 text-slate-700">{patient.systemExams?.['اسکلتی و عضلانی']?.notes || 'ثبت نشده'}</td>
                   </tr>
 
                   {/* سیستم عصبی */}
@@ -541,7 +541,7 @@ export const OfficialFormPrint: React.FC<Props> = ({ patient, onBack }) => {
                     <td className="border-l border-black p-1">
                       {patient.systemExams?.['سیستم عصبی']?.signs?.join('، ') || 'ثبت نشده'} {renderCheck(patient.systemExams?.['سیستم عصبی'] ? patient.systemExams['سیستم عصبی'].noSigns : undefined)} بدون نشانه
                     </td>
-                    <td className="p-1 text-slate-700">DTR نرمال، تعادل و هماهنگی عصبی برقرار</td>
+                    <td className="p-1 text-slate-700">{patient.systemExams?.['سیستم عصبی']?.notes || 'ثبت نشده'}</td>
                   </tr>
 
                   {/* اعصاب و روان */}
@@ -553,7 +553,7 @@ export const OfficialFormPrint: React.FC<Props> = ({ patient, onBack }) => {
                     <td className="border-l border-black p-1">
                       {patient.systemExams?.['اعصاب و روان']?.signs?.join('، ') || 'ثبت نشده'} {renderCheck(patient.systemExams?.['اعصاب و روان'] ? patient.systemExams['اعصاب و روان'].noSigns : undefined)} بدون نشانه
                     </td>
-                    <td className="p-1 text-slate-700">خلق و عاطفه مناسب، هوشیار و جهت‌یاب</td>
+                    <td className="p-1 text-slate-700">{patient.systemExams?.['اعصاب و روان']?.notes || 'ثبت نشده'}</td>
                   </tr>
                 </tbody>
               </table>
