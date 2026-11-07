@@ -958,7 +958,6 @@ export const OfficialFormPrint: React.FC<Props> = ({ patient, onBack }) => {
                 <div className="border-2 border-black p-2 text-center bg-white min-w-[120px]">
                   <div className="font-bold text-[10px]">مهر و امضاء پزشک طب کار</div>
                   <div className="text-[9px] text-emerald-700 mt-1 flex items-center justify-center gap-1">
-                    <ShieldCheck className="w-3.5 h-3.5" />
                     <span>امضای دیجیتال معتبر ثبت نشده است</span>
                   </div>
                 </div>
