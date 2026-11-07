@@ -106,8 +106,8 @@ export interface Patient {
       vaLeftNoCorr: string;
       vaRightWithCorr: string;
       vaLeftWithCorr: string;
-      colorVisionRight: 'طبیعی' | 'غیرطبیعی';
-      colorVisionLeft: 'طبیعی' | 'غیرطبیعی';
+      colorVisionRight: '' | 'طبیعی' | 'غیرطبیعی';
+      colorVisionLeft: '' | 'طبیعی' | 'غیرطبیعی';
       visualFieldRight: string;
       visualFieldLeft: string;
       depthArcSeconds: string;
